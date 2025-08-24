@@ -278,9 +278,8 @@
         ];
         let orders = [];
         let currentOrder = { clientName: '', supplier: '', items: [] };
-        let editingOrderId = null; // NUEVO: Para saber si estamos en modo edición
+        let editingOrderId = null;
 
-        // --- Selectores del DOM ---
         const productListEl = document.getElementById('productList');
         const productSearchEl = document.getElementById('productSearch');
         const clientNameInputEl = document.getElementById('clientNameInput');
@@ -290,14 +289,13 @@
         const currentOrderInfoEl = document.getElementById('currentOrderInfo');
         const finalizeOrderBtn = document.getElementById('finalizeOrderBtn');
         const clearOrderBtn = document.getElementById('clearOrderBtn');
-        const cancelEditBtn = document.getElementById('cancelEditBtn'); // NUEVO
-        const editingBanner = document.getElementById('editing-banner'); // NUEVO
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const editingBanner = document.getElementById('editing-banner');
         const orderHistoryContainerEl = document.getElementById('orderHistoryContainer');
         const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
         const liveToast = new bootstrap.Toast(document.getElementById('liveToast'));
         const toastBody = document.getElementById('toast-body-content');
         const createOrderTab = new bootstrap.Tab(document.getElementById('nav-create-order-tab'));
-
 
         const showToast = (message) => {
             toastBody.textContent = message;
@@ -410,6 +408,13 @@
                 
                 const listGroup = accordionItem.querySelector('.list-group');
                 clientOrders.forEach(order => {
+                    // ## CAMBIO REALIZADO AQUÍ ##
+                    // Se crea una lista <ul> para los productos en lugar de un texto simple.
+                    const itemsHtml = order.items.map(item => {
+                        const product = products.find(p => p.id === item.productId);
+                        return `<li class="small text-muted ps-2"> • ${product?.ref || 'N/A'} - <strong>Cant: ${item.quantity}</strong></li>`;
+                    }).join('');
+
                     const orderItem = document.createElement('div');
                     orderItem.className = 'list-group-item';
                     orderItem.innerHTML = `
@@ -417,7 +422,7 @@
                             <h6 class="mb-1">Pedido del ${order.date ? order.date.toDate().toLocaleDateString('es-CO') : 'N/A'}</h6>
                             <small>Depósito: <strong>${order.supplier}</strong></small>
                         </div>
-                        <small class="text-muted">${order.items.map(i => `${products.find(p=>p.id===i.productId)?.ref || 'N/A'} (x${i.quantity})`).join(', ')}</small>
+                        <ul class="list-unstyled mt-2 mb-0">${itemsHtml}</ul>
                         <div class="mt-2 text-end">
                             <button class="btn btn-sm btn-outline-primary edit-order-btn" data-order-id="${order.id}"><i class="fa-solid fa-pencil me-1"></i>Modificar</button>
                             <button class="btn btn-sm btn-outline-danger delete-order-btn" data-order-id="${order.id}"><i class="fa-solid fa-trash me-1"></i>Eliminar</button>
@@ -469,18 +474,15 @@
                 const productId = parseInt(target.dataset.id);
                 const newQuantity = parseInt(target.value);
                 const item = currentOrder.items.find(i => i.productId === productId);
-                if (item && newQuantity > 0) {
-                    item.quantity = newQuantity;
-                } else {
-                    currentOrder.items = currentOrder.items.filter(i => i.productId !== productId);
-                }
+                if (item && newQuantity > 0) { item.quantity = newQuantity; } 
+                else { currentOrder.items = currentOrder.items.filter(i => i.productId !== productId); }
                 renderCurrentOrder();
             }
         };
 
         const resetCurrentOrder = () => {
             currentOrder = { clientName: '', supplier: '', items: [] };
-            editingOrderId = null; // Salimos del modo edición
+            editingOrderId = null;
             clientNameInputEl.value = '';
             supplierSelectEl.value = '';
             renderCurrentOrder();
@@ -488,7 +490,6 @@
 
         finalizeOrderBtn.addEventListener('click', async () => {
             if (editingOrderId) {
-                // MODO ACTUALIZACIÓN
                 const orderRef = doc(db, "orders", editingOrderId);
                 try {
                     await updateDoc(orderRef, {
@@ -504,7 +505,6 @@
                     alert("Hubo un error al actualizar el pedido.");
                 }
             } else {
-                // MODO CREACIÓN/FUSIÓN
                 const today = new Date();
                 const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
                 const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
@@ -535,7 +535,6 @@
                         await updateDoc(orderRef, { items: existingItems });
                         alert(`Pedido para ${currentOrder.clientName} actualizado.`);
                     }
-
                     cartModal.hide();
                     resetCurrentOrder();
                 } catch (error) {
@@ -556,7 +555,6 @@
             });
         };
         
-        // --- NUEVOS EVENTOS PARA EDICIÓN Y ELIMINACIÓN ---
         orderHistoryContainerEl.addEventListener('click', async (e) => {
             const editBtn = e.target.closest('.edit-order-btn');
             const deleteBtn = e.target.closest('.delete-order-btn');
@@ -568,8 +566,7 @@
                     editingOrderId = orderId;
                     clientNameInputEl.value = orderToEdit.clientName;
                     supplierSelectEl.value = orderToEdit.supplier;
-                    currentOrder.items = JSON.parse(JSON.stringify(orderToEdit.items)); // Deep copy
-                    
+                    currentOrder.items = JSON.parse(JSON.stringify(orderToEdit.items));
                     renderCurrentOrder();
                     createOrderTab.show();
                     window.scrollTo(0, 0);
@@ -596,7 +593,6 @@
             }
         });
         
-        // --- Eventos existentes ---
         productSearchEl.addEventListener('input', (e) => renderProducts(e.target.value));
         
         productListEl.addEventListener('click', (e) => {
@@ -625,7 +621,6 @@
             }
         });
         
-        // --- Inicialización ---
         renderProducts();
         renderCurrentOrder();
         loadRealtimeData();
