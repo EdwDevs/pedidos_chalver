@@ -1,264 +1,667 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Sistema de Pedidos - CRM</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f9;
-    }
-    header {
-      background-color: #2c3e50;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    main {
-      padding: 1rem;
-    }
-    select, input, button {
-      margin: 0.5rem 0;
-      padding: 0.5rem;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: left;
-    }
-    .btn {
-      background-color: #3498db;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    .btn:hover {
-      background-color: #2980b9;
-    }
-    .delete-btn {
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      padding: 0.3rem 0.5rem;
-      cursor: pointer;
-    }
-    .delete-btn:hover {
-      background-color: #c0392b;
-    }
-    .history {
-      margin-top: 2rem;
-    }
-    .product-list {
-      max-height: 300px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-    }
-    .product-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.5rem;
-      border-bottom: 1px solid #eee;
-    }
-    .product-item:last-child {
-      border-bottom: none;
-    }
-    @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr {
-        display: block;
-      }
-      th {
-        text-align: left;
-      }
-      td {
-        position: relative;
-        padding-left: 50%;
-      }
-      td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 0.5rem;
-        top: 0.5rem;
-        font-weight: bold;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Pedidos y CRM Farmacéutico</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        :root {
+            --bs-primary-rgb: 8, 107, 133;
+            --bs-secondary-rgb: 108, 117, 125;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            font-size: 0.9rem;
+        }
+
+        .main-header {
+            background-color: #fff;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0.8rem 1rem;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            height: 100%;
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+        
+        #productListContainer, #orderHistoryContainer {
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+
+        .product-row:hover, .order-history-item:hover {
+            background-color: #e9ecef;
+            cursor: pointer;
+        }
+
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+            border-color: rgba(var(--bs-primary-rgb), 0.5);
+        }
+
+        .btn-primary {
+            background-color: rgb(var(--bs-primary-rgb));
+            border-color: rgb(var(--bs-primary-rgb));
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+            background-color: rgb(var(--bs-primary-rgb));
+            border-color: rgb(var(--bs-primary-rgb));
+        }
+
+        .sticky-top {
+            top: 15px; /* Margin from top */
+        }
+        
+        .badge {
+            font-size: 0.8em;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Sistema de Pedidos - CRM</h1>
-  </header>
-  <main>
-    <label for="deposit">Selecciona Depósito:</label>
-    <select id="deposit" onchange="filterProducts()">
-      <option value="">-- Seleccionar --</option>
-      <option value="DROSAN">DROSAN</option>
-      <option value="UNIDROGAS">UNIDROGAS</option>
-    </select>
 
-    <input type="text" id="search" placeholder="Buscar producto..." onkeyup="filterProducts()">
+    <header class="main-header d-flex justify-content-between align-items-center sticky-top bg-light">
+        <h4 class="mb-0"><i class="fa-solid fa-pills text-primary"></i> Sistema de Pedidos y CRM</h4>
+        <div id="currentTime" class="text-secondary fw-bold"></div>
+    </header>
 
-    <div class="product-list" id="productList"></div>
+    <main class="container-fluid mt-3">
+        <div class="row g-3">
+            <div class="col-lg-3">
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-users me-2"></i>Gestión de Cliente</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="clientSelect" class="form-label">Seleccionar Cliente:</label>
+                            <div class="input-group">
+                                <select class="form-select" id="clientSelect">
+                                    <option selected disabled>-- Ningún cliente seleccionado --</option>
+                                </select>
+                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#addClientModal" title="Agregar Nuevo Cliente">
+                                    <i class="fa-solid fa-user-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="clientDetails" class="p-3 bg-light rounded" style="display: none;">
+                            <h6 class="mb-1" id="clientName"></h6>
+                            <small class="text-muted d-block" id="clientNit"></small>
+                            <small class="text-muted d-block" id="clientAddress"></small>
+                            <small class="text-muted d-block" id="clientPhone"></small>
+                        </div>
 
-    <h2>Pedido Actual</h2>
-    <table id="orderTable">
-      <thead>
-        <tr>
-          <th>Producto</th>
-          <th>Cantidad</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody id="orderBody"></tbody>
-    </table>
-    <button class="btn" onclick="saveOrder()">Guardar Pedido</button>
+                        <hr>
+                        
+                        <div class="mb-3">
+                            <label for="supplierSelect" class="form-label">Seleccionar Depósito:</label>
+                            <select class="form-select" id="supplierSelect">
+                                <option selected disabled>-- Seleccione un depósito --</option>
+                                <option value="DROSAN">DROSAN</option>
+                                <option value="UNIDROGAS">UNIDROGAS</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="history">
-      <h2>Historial de Pedidos</h2>
-      <table id="historyTable">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Fecha</th>
-            <th>Depósito</th>
-            <th>Total Items</th>
-          </tr>
-        </thead>
-        <tbody id="historyBody"></tbody>
-      </table>
+                <div class="card mt-3">
+                    <div class="card-header"><i class="fa-solid fa-history me-2"></i>Historial de Pedidos del Cliente</div>
+                    <div class="card-body p-0">
+                         <div id="orderHistoryContainer" class="list-group list-group-flush">
+                            <div class="list-group-item text-center text-muted">Seleccione un cliente para ver su historial.</div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-boxes-stacked me-2"></i>Catálogo de Productos</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-search"></i></span>
+                                <input type="text" id="productSearch" class="form-control" placeholder="Buscar producto por nombre o principio activo...">
+                            </div>
+                        </div>
+                        <div id="productListContainer">
+                            <table class="table table-hover table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Referencia</th>
+                                        <th>Principio Activo</th>
+                                        <th class="text-end">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productList">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="sticky-top">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-cart-shopping me-2"></i>Pedido Actual</span>
+                            <span id="currentOrderInfo" class="badge bg-secondary"></span>
+                        </div>
+                        <div class="card-body">
+                            <div id="currentOrderItems" style="min-height: 200px;">
+                                <div class="text-center text-muted mt-5">Agregue productos desde el catálogo.</div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-end">
+                            <button class="btn btn-danger me-2" id="clearOrderBtn"><i class="fa-solid fa-trash me-1"></i> Limpiar</button>
+                            <button class="btn btn-primary" id="finalizeOrderBtn" disabled><i class="fa-solid fa-check-circle me-1"></i> Finalizar Pedido</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal fade" id="addClientModal" tabindex="-1" aria-labelledby="addClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addClientModalLabel">Agregar Nuevo Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addClientForm">
+                        <div class="mb-3">
+                            <label for="newClientName" class="form-label">Nombre del Cliente</label>
+                            <input type="text" class="form-control" id="newClientName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newClientNit" class="form-label">NIT / C.C.</label>
+                            <input type="text" class="form-control" id="newClientNit" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newClientAddress" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="newClientAddress">
+                        </div>
+                        <div class="mb-3">
+                            <label for="newClientPhone" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="newClientPhone">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-  </main>
+    
+    <div class="modal fade" id="viewOrderModal" tabindex="-1" aria-labelledby="viewOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewOrderModalLabel">Detalle del Pedido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Cliente:</strong> <span id="modalOrderClient"></span></p>
+                            <p><strong>Depósito:</strong> <span id="modalOrderSupplier"></span></p>
+                        </div>
+                         <div class="col-md-6 text-md-end">
+                            <p><strong>ID Pedido:</strong> <span id="modalOrderId"></span></p>
+                            <p><strong>Fecha:</strong> <span id="modalOrderDate"></span></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Referencia</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalOrderItems">
+                            </tbody>
+                    </table>
+                </div>
+                 <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
 
-  <script>
-    const products = [
-      { name: "AIRMAX AEROSOL HFC X 200DOSIS (1+1) (SALBUTAMOL)", deposit: "DROSAN" },
-      { name: "AIRMAX AEROSOL HFC X 200DOSIS (SALBUTAMOL)", deposit: "DROSAN" },
-      { name: "ASPROMIO AEROSOL X 200 DOSIS (B.IPRATROPIO)", deposit: "DROSAN" },
-      { name: "BIFIDOLAC 170MG X 6SOB (LACTOBACILO)", deposit: "DROSAN" },
-      { name: "BUSTEROL AEROSOL HFC X 200 DOSIS (BUDESONIDA + FORMOTEROL FUMARATO)", deposit: "DROSAN" },
-      { name: "CLOBEZAN CR X 25GR (CLOBETASOL)", deposit: "UNIDROGAS" },
-      { name: "CLOBEZAN LOCION X 60ML (CLOBETASOL)", deposit: "UNIDROGAS" },
-      { name: "CLOBEZAN UNG X 25GR (CLOBETASOL)", deposit: "UNIDROGAS" },
-      // Añade más productos aquí si lo deseas
-    ];
+        // --- DATA ---
+        const products = [
+            { id: 1, ref: 'AIRMAX HFC 200DS (1+1)', name: 'AIRMAX AEROSOL HFC X 200DOSIS (1+1)', principle: 'SALBUTAMOL' },
+            { id: 2, ref: 'AIRMAX HFC 200DS', name: 'AIRMAX AEROSOL HFC X 200DOSIS', principle: 'SALBUTAMOL' },
+            { id: 3, ref: 'ASPROMIO AEROSOL 200DS', name: 'ASPROMIO AEROSOL X 200 DOSIS', principle: 'B.IPRATROPIO' },
+            { id: 4, ref: 'BIFIDOLAC 170MG X 6SOB', name: 'BIFIDOLAC 170MG X 6SOB', principle: 'LACTOBACILO' },
+            { id: 5, ref: 'BUSTEROL AEROSOL 200DS', name: 'BUSTEROL AEROSOL HFC X 200 DOSIS', principle: 'BUDESONIDA + FORMOTEROL' },
+            { id: 6, ref: 'CLOBEZAN CR X 25GR', name: 'CLOBEZAN CR X 25GR', principle: 'CLOBETASOL' },
+            { id: 7, ref: 'CLOBEZAN LOCION X 60ML', name: 'CLOBEZAN LOCION X 60ML', principle: 'CLOBETASOL' },
+            { id: 8, ref: 'CLOBEZAN UNG X 25GR', name: 'CLOBEZAN UNG X 25GR', principle: 'CLOBETASOL' },
+            { id: 9, ref: 'CUTAMYCON 500 X 1CBG', name: 'CUTAMYCON 500 X 1CBG', principle: 'CLOTRIMAZOL' },
+            { id: 10, ref: 'CUTAMYCON CR TOPICA X 20GR', name: 'CUTAMYCON CR TOPICA X 20GR', principle: 'CLOTRIMAZOL' },
+            { id: 11, ref: 'DESCONGEL F JBE X 60ML', name: 'DESCONGEL F JBE X 60ML', principle: 'FENILEFRINA + CETIRIZINA' },
+            { id: 12, ref: 'DESCONGEL GRIPA X 10CBG', name: 'DESCONGEL GRIPA X 10CBG', principle: 'FENILEFRINA + CETIRIZINA' },
+            { id: 13, ref: 'DESCONGEL LS X 100CAP', name: 'DESCONGEL LS X 100CAP', principle: 'FENILEFRINA + CETIRIZINA' },
+            { id: 14, ref: 'DESCONGELITO F GOTAS X 15ML', name: 'DESCONGELITO F GOTAS X 15ML', principle: 'FENILEFRINA + CETIRIZINA' },
+            { id: 15, ref: 'DESLORAN 5 MG X 10TBS', name: 'DESLORAN 5 MG X 10TBS', principle: 'DESLORATADINA' },
+            { id: 16, ref: 'DESLORAN JBE 0.05% X 60ML', name: 'DESLORAN JBE 0.05% X 60ML', principle: 'DESLORATADINA' },
+            { id: 17, ref: 'DOLFENAX 200MG X 10CAPS', name: 'DOLFENAX 200MG X 10CAPS', principle: 'A.TOLFENAMICO' },
+            { id: 18, ref: 'DUOPAS 400/20MG X 10TBS', name: 'DUOPAS 400/20MG X 10TBS', principle: 'IBUPROFENO+H.BUTILBROMURO' },
+            { id: 19, ref: 'ESTERMAX 0.625MG CR VAG X40GR', name: 'ESTERMAX 0.625MG CR VAG X40GR', principle: 'ESTROGENOS CONJUGADOS' },
+            { id: 20, ref: 'ESTERMAX 0.625MG X28TBS', name: 'ESTERMAX 0.625MG X28TBS', principle: 'ESTROGENOS CONJUGADOS' },
+            { id: 21, ref: 'FEMTRIOL CR VAG X 20GR', name: 'FEMTRIOL CR VAG X 20GR (5 APLICADOR)', principle: 'ESTRIOL' },
+            { id: 22, ref: 'FLUTURAN X 10CBG', name: 'FLUTURAN X 10CBG', principle: 'IBUPROFENO+DESLORATADINA' },
+            { id: 23, ref: 'FLUZETRIN F GOTAS PED X 15ML', name: 'FLUZETRIN F GOTAS PED X 15ML', principle: 'CETIRIZINA+FENILEFRINA' },
+            { id: 24, ref: 'FLUZETRIN F JBE X 60ML', name: 'FLUZETRIN F JBE X 60ML', principle: 'CETIRIZINA+FENILEFRINA' },
+            { id: 25, ref: 'FLUZETRIN F X 10CAP', name: 'FLUZETRIN F X 10CAP', principle: 'ACETAMINOFEN+CETIRIZINA' },
+            { id: 26, ref: 'FRIOTAN 65MG X 10CAPS', name: 'FRIOTAN 65MG X 10CAPS', principle: 'HEDERA HELIX' },
+            { id: 27, ref: 'FRIOTAN JBE X 120ML', name: 'FRIOTAN JBE X 120ML', principle: 'HEDERA HELIX' },
+            { id: 28, ref: 'FYNEXIN GEL 5% X 20GR', name: 'FYNEXIN GEL 5% X 20GR', principle: 'IBUPROFENO' },
+            { id: 29, ref: 'HYGIENEX ANTIPIOJOS X 24S/S', name: 'HYGIENEX ANTIPIOJOS X 24S/S', principle: 'CIPERMETRINA' },
+            { id: 30, ref: 'INFLABON 200MCG HFC AEROSOL', name: 'INFLABON 200MCG HFC AEROSOL', principle: 'BUDESONIDA' },
+            { id: 31, ref: 'INFLABON 50MCG HFC AEROSOL', name: 'INFLABON 50MCG HFC AEROSOL', principle: 'BUDESONIDA' },
+            { id: 32, ref: 'INFLACOR 4 MG AMP X 1ML', name: 'INFLACOR 4 MG AMP X 1ML', principle: 'BETAMETASONA' },
+            { id: 33, ref: 'INFLACOR 8 MG AMP X 2ML', name: 'INFLACOR 8 MG AMP X 2ML', principle: 'BETAMETASONA' },
+            { id: 34, ref: 'INFLACOR RET 3/3MG AMP X 1ML', name: 'INFLACOR RET 3/3MG AMP X 1ML', principle: 'BETAMETASONA' },
+            { id: 35, ref: 'INFLACOR RET 6/6MG AMP X 2ML', name: 'INFLACOR RET 6/6MG AMP X 2ML', principle: 'BETAMETASONA' },
+            { id: 36, ref: 'LACTULAX JBE X240ML', name: 'LACTULAX JBE X240ML', principle: 'LACTULOSA' },
+            { id: 37, ref: 'LACTULAX X 12S/S', name: 'LACTULAX X 12S/S', principle: 'LACTULOSA' },
+            { id: 38, ref: 'MULTIDOL 800MG X 30CBG', name: 'MULTIDOL 800MG X 30CBG', principle: 'IBUPROFENO' },
+            { id: 39, ref: 'MULTIDOL EXPRESS 400MG X 48CBG (2+1)', name: 'MULTIDOL EXPRESS 400MG X 48CBG (2+1)', principle: 'IBUPROFENO' },
+            { id: 40, ref: 'MULTIDOL EXPRESS 400MG X 48CBG', name: 'MULTIDOL EXPRESS 400MG X 48CBG', principle: 'IBUPROFENO' },
+            { id: 41, ref: 'NEUROPRON INY 2ML X 3AMP', name: 'NEUROPRON INY 2ML X 3AMP', principle: 'COMPLEJO B' },
+            { id: 42, ref: 'NEUROPRON INY X 2ML (UNIDAD)', name: 'NEUROPRON INY X 2ML (UNIDAD)', principle: 'COMPLEJO B' },
+            { id: 43, ref: 'PARAXIN 500MG X 6TBS', name: 'PARAXIN 500MG X 6TBS', principle: 'NITAZOXANIDA' },
+            { id: 44, ref: 'PARAXIN SUSP X 30ML', name: 'PARAXIN SUSP X 30ML', principle: 'NITAZOXANIDA' },
+            { id: 45, ref: 'SIMPAUSE 100MG X 30CBG', name: 'SIMPAUSE 100MG X 30CBG', principle: 'ISOFLAVONA' },
+            { id: 46, ref: 'TEREX CR VAG X 20GR', name: 'TEREX CR VAG X 20GR+3APLICADORES', principle: 'TERCONAZOL+DEXAMETASONA' },
+            { id: 47, ref: 'TIBONELLA 2.5MG X 28TBS', name: 'TIBONELLA 2.5MG X 28TBS', principle: 'TIBOLONA' },
+            { id: 48, ref: 'TRIGENTAX CR X 20GR', name: 'TRIGENTAX CR X 20GR', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA' },
+            { id: 49, ref: 'TRIGENTAX CR X 40GR', name: 'TRIGENTAX CR X 40GR', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA' },
+            { id: 50, ref: 'TRIGENTAX CR X 40GR X 2 GTS', name: 'TRIGENTAX CR X 40GR X 2 GTS ALCOHOL X 350ML', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA' },
+            { id: 51, ref: 'TRIGENTAX LOC TOP. X 50ML', name: 'TRIGENTAX LOC TOP. X 50ML', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA' },
+            { id: 52, ref: 'TRIGENTAX X 20GR X 3 GTS', name: 'TRIGENTAX X 20GR X 3 GTS 2 ALCOHOL X 120ML', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA' },
+            { id: 53, ref: 'VAGINSOL F OVULOS', name: 'VAGINSOL F 100+200MG X 3 OVULOS', principle: 'CLINDAMICINA+CLOTRIMAZOL' },
+            { id: 54, ref: 'VAGINSOL F CR VAG X 20GR', name: 'VAGINSOL F CR VAG X 20GR+3 APLIC.', principle: 'CLINDAMICINA+CLOTRIMAZOL' },
+            { id: 55, ref: 'ZAKOR 100MG X 6 TBS', name: 'ZAKOR 100MG X 6 TBS', principle: 'MEBENDAZOL' },
+            { id: 56, ref: 'ZAKOR SUSP X 30ML', name: 'ZAKOR SUSP X 30ML', principle: 'MEBENDAZOL' },
+        ];
 
-    let order = [];
+        // --- STATE ---
+        let clients = [];
+        let orders = [];
+        let currentOrder = {
+            clientId: null,
+            supplier: null,
+            items: [] // { productId, quantity }
+        };
 
-    function filterProducts() {
-      const deposit = document.getElementById("deposit").value;
-      const search = document.getElementById("search").value.toLowerCase();
-      const filtered = products.filter(p =>
-        (deposit === "" || p.deposit === deposit) &&
-        p.name.toLowerCase().includes(search)
-      );
-      renderProductList(filtered);
-    }
+        // --- DOM Elements ---
+        const productListEl = document.getElementById('productList');
+        const productSearchEl = document.getElementById('productSearch');
+        const clientSelectEl = document.getElementById('clientSelect');
+        const addClientFormEl = document.getElementById('addClientForm');
+        const clientDetailsEl = document.getElementById('clientDetails');
+        const supplierSelectEl = document.getElementById('supplierSelect');
+        const currentOrderItemsEl = document.getElementById('currentOrderItems');
+        const finalizeOrderBtn = document.getElementById('finalizeOrderBtn');
+        const clearOrderBtn = document.getElementById('clearOrderBtn');
+        const currentOrderInfoEl = document.getElementById('currentOrderInfo');
+        const orderHistoryContainerEl = document.getElementById('orderHistoryContainer');
+        const currentTimeEl = document.getElementById('currentTime');
+        const addClientModal = new bootstrap.Modal(document.getElementById('addClientModal'));
+        const viewOrderModal = new bootstrap.Modal(document.getElementById('viewOrderModal'));
 
-    function renderProductList(products) {
-      const list = document.getElementById("productList");
-      list.innerHTML = "";
-      products.forEach((product, index) => {
-        const div = document.createElement("div");
-        div.className = "product-item";
-        div.innerHTML = `
-          <span>${product.name}</span>
-          <button onclick="addToOrder('${product.name}')">+</button>
-        `;
-        list.appendChild(div);
-      });
-    }
 
-    function addToOrder(name) {
-      const existing = order.find(item => item.name === name);
-      if (existing) {
-        existing.quantity++;
-      } else {
-        order.push({ name, quantity: 1 });
-      }
-      renderOrder();
-    }
+        // --- RENDER FUNCTIONS ---
+        const renderProducts = (filter = '') => {
+            productListEl.innerHTML = '';
+            const filteredProducts = products.filter(p => 
+                p.ref.toLowerCase().includes(filter) || 
+                p.principle.toLowerCase().includes(filter)
+            );
 
-    function removeFromOrder(index) {
-      order.splice(index, 1);
-      renderOrder();
-    }
+            if (filteredProducts.length === 0) {
+                 productListEl.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No se encontraron productos.</td></tr>';
+                 return;
+            }
+            
+            filteredProducts.forEach(product => {
+                const tr = document.createElement('tr');
+                tr.className = 'product-row';
+                tr.innerHTML = `
+                    <td>
+                        <strong>${product.ref}</strong><br>
+                        <small class="text-muted">${product.name}</small>
+                    </td>
+                    <td><span class="badge bg-secondary">${product.principle}</span></td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-primary add-product-btn" data-id="${product.id}">
+                           <i class="fa-solid fa-plus"></i> Agregar
+                        </button>
+                    </td>
+                `;
+                productListEl.appendChild(tr);
+            });
+        };
+        
+        const renderClients = () => {
+            clientSelectEl.innerHTML = '<option selected disabled>-- Ningún cliente seleccionado --</option>';
+            clients.sort((a, b) => a.name.localeCompare(b.name)).forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.id;
+                option.textContent = client.name;
+                clientSelectEl.appendChild(option);
+            });
+        };
 
-    function renderOrder() {
-      const tbody = document.getElementById("orderBody");
-      tbody.innerHTML = "";
-      order.forEach((item, index) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td data-label="Producto">${item.name}</td>
-          <td data-label="Cantidad"><input type="number" min="1" value="${item.quantity}" onchange="updateQuantity(${index}, this.value)"></td>
-          <td data-label="Acción"><button class="delete-btn" onclick="removeFromOrder(${index})">Eliminar</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
+        const renderCurrentOrder = () => {
+            currentOrderItemsEl.innerHTML = '';
+            if (currentOrder.items.length === 0) {
+                currentOrderItemsEl.innerHTML = '<div class="text-center text-muted mt-5">Agregue productos desde el catálogo.</div>';
+                updateUIState();
+                return;
+            }
+            
+            const table = document.createElement('table');
+            table.className = 'table table-sm';
+            table.innerHTML = `
+                <thead class="table-light">
+                    <tr>
+                        <th>Producto</th>
+                        <th style="width: 100px;">Cantidad</th>
+                        <th class="text-end">Acción</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>`;
+            const tbody = table.querySelector('tbody');
 
-    function updateQuantity(index, value) {
-      order[index].quantity = parseInt(value) || 1;
-    }
+            currentOrder.items.forEach(item => {
+                const product = products.find(p => p.id === item.productId);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${product.ref}</td>
+                    <td>
+                        <input type="number" class="form-control form-control-sm quantity-input" value="${item.quantity}" min="1" data-id="${product.id}">
+                    </td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-danger remove-item-btn" data-id="${product.id}">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            currentOrderItemsEl.appendChild(table);
+            updateUIState();
+        };
 
-    function saveOrder() {
-      const deposit = document.getElementById("deposit").value;
-      if (!deposit) {
-        alert("Por favor selecciona un depósito.");
-        return;
-      }
-      if (order.length === 0) {
-        alert("El pedido está vacío.");
-        return;
-      }
+        const renderOrderHistory = (clientId) => {
+            orderHistoryContainerEl.innerHTML = '';
+            const clientOrders = orders
+                .filter(o => o.clientId === clientId)
+                .sort((a,b) => new Date(b.date) - new Date(a.date));
 
-      const history = JSON.parse(localStorage.getItem("orders") || "[]");
-      const newOrder = {
-        id: history.length + 1,
-        date: new Date().toLocaleString(),
-        deposit,
-        items: order.length,
-        details: [...order]
-      };
-      history.push(newOrder);
-      localStorage.setItem("orders", JSON.stringify(history));
-      order = [];
-      renderOrder();
-      loadHistory();
-      alert("Pedido guardado correctamente.");
-    }
+            if (clientOrders.length === 0) {
+                orderHistoryContainerEl.innerHTML = '<div class="list-group-item text-center text-muted">Este cliente no tiene pedidos.</div>';
+                return;
+            }
 
-    function loadHistory() {
-      const history = JSON.parse(localStorage.getItem("orders") || "[]");
-      const tbody = document.getElementById("historyBody");
-      tbody.innerHTML = "";
-      history.forEach(order => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td data-label="ID">${order.id}</td>
-          <td data-label="Fecha">${order.date}</td>
-          <td data-label="Depósito">${order.deposit}</td>
-          <td data-label="Total Items">${order.items}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
+            clientOrders.forEach(order => {
+                const item = document.createElement('a');
+                item.href = '#';
+                item.className = 'list-group-item list-group-item-action flex-column align-items-start order-history-item';
+                item.dataset.orderId = order.id;
+                item.innerHTML = `
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">${order.supplier}</h6>
+                        <small>${new Date(order.date).toLocaleDateString('es-CO')}</small>
+                    </div>
+                    <p class="mb-1">ID: ${order.id}</p>
+                    <small>${order.items.length} producto(s)</small>
+                `;
+                orderHistoryContainerEl.appendChild(item);
+            });
+        }
+        
+        const updateUIState = () => {
+            const client = clients.find(c => c.id === currentOrder.clientId);
+            const supplier = currentOrder.supplier;
 
-    // Inicializar
-    window.onload = () => {
-      loadHistory();
-    };
-  </script>
+            if(client && supplier) {
+                currentOrderInfoEl.textContent = `${client.name} / ${supplier}`;
+                currentOrderInfoEl.className = 'badge bg-primary';
+            } else if (client) {
+                currentOrderInfoEl.textContent = `${client.name} / Sin depósito`;
+                currentOrderInfoEl.className = 'badge bg-warning text-dark';
+            } else if (supplier) {
+                currentOrderInfoEl.textContent = `Sin cliente / ${supplier}`;
+                currentOrderInfoEl.className = 'badge bg-warning text-dark';
+            } else {
+                currentOrderInfoEl.textContent = `Sin cliente / Sin depósito`;
+                currentOrderInfoEl.className = 'badge bg-secondary';
+            }
+
+            const canFinalize = currentOrder.clientId && currentOrder.supplier && currentOrder.items.length > 0;
+            finalizeOrderBtn.disabled = !canFinalize;
+        };
+        
+        const updateClock = () => {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            currentTimeEl.textContent = now.toLocaleDateString('es-CO', options);
+        };
+
+        // --- EVENT HANDLERS ---
+        productSearchEl.addEventListener('input', (e) => renderProducts(e.target.value.toLowerCase()));
+
+        productListEl.addEventListener('click', (e) => {
+            const btn = e.target.closest('.add-product-btn');
+            if (btn) {
+                const productId = parseInt(btn.dataset.id);
+                addProductToOrder(productId);
+            }
+        });
+
+        addClientFormEl.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newClient = {
+                id: Date.now(),
+                name: document.getElementById('newClientName').value,
+                nit: document.getElementById('newClientNit').value,
+                address: document.getElementById('newClientAddress').value,
+                phone: document.getElementById('newClientPhone').value
+            };
+            clients.push(newClient);
+            saveData();
+            renderClients();
+            clientSelectEl.value = newClient.id;
+            handleClientChange(); // Trigger change to update UI
+            addClientFormEl.reset();
+            addClientModal.hide();
+        });
+
+        clientSelectEl.addEventListener('change', handleClientChange);
+        
+        function handleClientChange() {
+            const clientId = parseInt(clientSelectEl.value);
+            const client = clients.find(c => c.id === clientId);
+            if (client) {
+                clientDetailsEl.style.display = 'block';
+                document.getElementById('clientName').textContent = client.name;
+                document.getElementById('clientNit').textContent = `NIT/CC: ${client.nit}`;
+                document.getElementById('clientAddress').textContent = `Dir: ${client.address}`;
+                document.getElementById('clientPhone').textContent = `Tel: ${client.phone}`;
+                currentOrder.clientId = clientId;
+                renderOrderHistory(clientId);
+            } else {
+                clientDetailsEl.style.display = 'none';
+                currentOrder.clientId = null;
+                orderHistoryContainerEl.innerHTML = '<div class="list-group-item text-center text-muted">Seleccione un cliente para ver su historial.</div>';
+            }
+            updateUIState();
+        }
+
+        supplierSelectEl.addEventListener('change', () => {
+            currentOrder.supplier = supplierSelectEl.value;
+            updateUIState();
+        });
+        
+        currentOrderItemsEl.addEventListener('change', (e) => {
+             if (e.target.classList.contains('quantity-input')) {
+                const productId = parseInt(e.target.dataset.id);
+                const newQuantity = parseInt(e.target.value);
+                updateQuantity(productId, newQuantity);
+            }
+        });
+
+        currentOrderItemsEl.addEventListener('click', (e) => {
+             if (e.target.closest('.remove-item-btn')) {
+                const productId = parseInt(e.target.closest('.remove-item-btn').dataset.id);
+                removeProductFromOrder(productId);
+            }
+        });
+        
+        clearOrderBtn.addEventListener('click', () => {
+            if(confirm('¿Está seguro de que desea limpiar el pedido actual?')) {
+                resetCurrentOrder();
+            }
+        });
+
+        finalizeOrderBtn.addEventListener('click', () => {
+            const clientName = clients.find(c => c.id === currentOrder.clientId).name;
+            if(confirm(`Finalizar pedido para ${clientName} con el depósito ${currentOrder.supplier}?`)) {
+                const newOrder = {
+                    id: 'P-' + Date.now(),
+                    ...currentOrder,
+                    date: new Date().toISOString()
+                };
+                orders.push(newOrder);
+                saveData();
+                alert(`Pedido ${newOrder.id} guardado exitosamente.`);
+                renderOrderHistory(currentOrder.clientId);
+                resetCurrentOrder();
+            }
+        });
+
+        orderHistoryContainerEl.addEventListener('click', (e) => {
+            const orderItem = e.target.closest('.order-history-item');
+            if (orderItem) {
+                const orderId = orderItem.dataset.orderId;
+                const order = orders.find(o => o.id === orderId);
+                showOrderDetails(order);
+            }
+        });
+        
+        // --- LOGIC FUNCTIONS ---
+        const addProductToOrder = (productId) => {
+            const existingItem = currentOrder.items.find(item => item.productId === productId);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                currentOrder.items.push({ productId, quantity: 1 });
+            }
+            renderCurrentOrder();
+        };
+
+        const removeProductFromOrder = (productId) => {
+            currentOrder.items = currentOrder.items.filter(item => item.productId !== productId);
+            renderCurrentOrder();
+        };
+        
+        const updateQuantity = (productId, newQuantity) => {
+            const item = currentOrder.items.find(item => item.productId === productId);
+            if(item && newQuantity > 0) {
+                item.quantity = newQuantity;
+            } else { // if quantity is 0 or less, remove it
+                removeProductFromOrder(productId);
+            }
+            renderCurrentOrder(); // Rerender to reflect potential removal
+        };
+
+        const resetCurrentOrder = () => {
+            currentOrder.items = [];
+            // Keep client and supplier selected for convenience
+            // currentOrder.clientId = null;
+            // currentOrder.supplier = null;
+            // clientSelectEl.value = '-- Ningún cliente seleccionado --';
+            // supplierSelectEl.value = '-- Seleccione un depósito --';
+            // clientDetailsEl.style.display = 'none';
+            renderCurrentOrder();
+            updateUIState();
+        };
+        
+        const showOrderDetails = (order) => {
+            const client = clients.find(c => c.id === order.clientId);
+            document.getElementById('modalOrderClient').textContent = client ? client.name : 'N/A';
+            document.getElementById('modalOrderSupplier').textContent = order.supplier;
+            document.getElementById('modalOrderId').textContent = order.id;
+            document.getElementById('modalOrderDate').textContent = new Date(order.date).toLocaleString('es-CO');
+            
+            const itemsTbody = document.getElementById('modalOrderItems');
+            itemsTbody.innerHTML = '';
+            order.items.forEach(item => {
+                const product = products.find(p => p.id === item.productId);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${product ? product.ref : 'Producto no encontrado'}</td>
+                    <td>${item.quantity}</td>
+                `;
+                itemsTbody.appendChild(tr);
+            });
+
+            viewOrderModal.show();
+        }
+
+        // --- LOCAL STORAGE ---
+        const saveData = () => {
+            localStorage.setItem('crm_clients', JSON.stringify(clients));
+            localStorage.setItem('crm_orders', JSON.stringify(orders));
+        };
+
+        const loadData = () => {
+            const storedClients = localStorage.getItem('crm_clients');
+            const storedOrders = localStorage.getItem('crm_orders');
+            if (storedClients) clients = JSON.parse(storedClients);
+            if (storedOrders) orders = JSON.parse(storedOrders);
+        };
+
+        // --- INITIALIZATION ---
+        const init = () => {
+            loadData();
+            renderProducts();
+            renderClients();
+            updateUIState();
+            updateClock();
+            setInterval(updateClock, 1000); // Update clock every second
+        };
+
+        init();
+    });
+    </script>
 </body>
 </html>
