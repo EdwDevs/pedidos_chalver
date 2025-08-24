@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema de Pedidos - CRM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      padding: 1rem;
+    }
+    select, input, button {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    .btn {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #2980b9;
+    }
+    .delete-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 0.3rem 0.5rem;
+      cursor: pointer;
+    }
+    .delete-btn:hover {
+      background-color: #c0392b;
+    }
+    .history {
+      margin-top: 2rem;
+    }
+    .product-list {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+    }
+    .product-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem;
+      border-bottom: 1px solid #eee;
+    }
+    .product-item:last-child {
+      border-bottom: none;
+    }
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      th {
+        text-align: left;
+      }
+      td {
+        position: relative;
+        padding-left: 50%;
+      }
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0.5rem;
+        top: 0.5rem;
+        font-weight: bold;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Sistema de Pedidos - CRM</h1>
+  </header>
+  <main>
+    <label for="deposit">Selecciona Depósito:</label>
+    <select id="deposit" onchange="filterProducts()">
+      <option value="">-- Seleccionar --</option>
+      <option value="DROSAN">DROSAN</option>
+      <option value="UNIDROGAS">UNIDROGAS</option>
+    </select>
+
+    <input type="text" id="search" placeholder="Buscar producto..." onkeyup="filterProducts()">
+
+    <div class="product-list" id="productList"></div>
+
+    <h2>Pedido Actual</h2>
+    <table id="orderTable">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody id="orderBody"></tbody>
+    </table>
+    <button class="btn" onclick="saveOrder()">Guardar Pedido</button>
+
+    <div class="history">
+      <h2>Historial de Pedidos</h2>
+      <table id="historyTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Depósito</th>
+            <th>Total Items</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const products = [
+      { name: "AIRMAX AEROSOL HFC X 200DOSIS (1+1) (SALBUTAMOL)", deposit: "DROSAN" },
+      { name: "AIRMAX AEROSOL HFC X 200DOSIS (SALBUTAMOL)", deposit: "DROSAN" },
+      { name: "ASPROMIO AEROSOL X 200 DOSIS (B.IPRATROPIO)", deposit: "DROSAN" },
+      { name: "BIFIDOLAC 170MG X 6SOB (LACTOBACILO)", deposit: "DROSAN" },
+      { name: "BUSTEROL AEROSOL HFC X 200 DOSIS (BUDESONIDA + FORMOTEROL FUMARATO)", deposit: "DROSAN" },
+      { name: "CLOBEZAN CR X 25GR (CLOBETASOL)", deposit: "UNIDROGAS" },
+      { name: "CLOBEZAN LOCION X 60ML (CLOBETASOL)", deposit: "UNIDROGAS" },
+      { name: "CLOBEZAN UNG X 25GR (CLOBETASOL)", deposit: "UNIDROGAS" },
+      // Añade más productos aquí si lo deseas
+    ];
+
+    let order = [];
+
+    function filterProducts() {
+      const deposit = document.getElementById("deposit").value;
+      const search = document.getElementById("search").value.toLowerCase();
+      const filtered = products.filter(p =>
+        (deposit === "" || p.deposit === deposit) &&
+        p.name.toLowerCase().includes(search)
+      );
+      renderProductList(filtered);
+    }
+
+    function renderProductList(products) {
+      const list = document.getElementById("productList");
+      list.innerHTML = "";
+      products.forEach((product, index) => {
+        const div = document.createElement("div");
+        div.className = "product-item";
+        div.innerHTML = `
+          <span>${product.name}</span>
+          <button onclick="addToOrder('${product.name}')">+</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function addToOrder(name) {
+      const existing = order.find(item => item.name === name);
+      if (existing) {
+        existing.quantity++;
+      } else {
+        order.push({ name, quantity: 1 });
+      }
+      renderOrder();
+    }
+
+    function removeFromOrder(index) {
+      order.splice(index, 1);
+      renderOrder();
+    }
+
+    function renderOrder() {
+      const tbody = document.getElementById("orderBody");
+      tbody.innerHTML = "";
+      order.forEach((item, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td data-label="Producto">${item.name}</td>
+          <td data-label="Cantidad"><input type="number" min="1" value="${item.quantity}" onchange="updateQuantity(${index}, this.value)"></td>
+          <td data-label="Acción"><button class="delete-btn" onclick="removeFromOrder(${index})">Eliminar</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateQuantity(index, value) {
+      order[index].quantity = parseInt(value) || 1;
+    }
+
+    function saveOrder() {
+      const deposit = document.getElementById("deposit").value;
+      if (!deposit) {
+        alert("Por favor selecciona un depósito.");
+        return;
+      }
+      if (order.length === 0) {
+        alert("El pedido está vacío.");
+        return;
+      }
+
+      const history = JSON.parse(localStorage.getItem("orders") || "[]");
+      const newOrder = {
+        id: history.length + 1,
+        date: new Date().toLocaleString(),
+        deposit,
+        items: order.length,
+        details: [...order]
+      };
+      history.push(newOrder);
+      localStorage.setItem("orders", JSON.stringify(history));
+      order = [];
+      renderOrder();
+      loadHistory();
+      alert("Pedido guardado correctamente.");
+    }
+
+    function loadHistory() {
+      const history = JSON.parse(localStorage.getItem("orders") || "[]");
+      const tbody = document.getElementById("historyBody");
+      tbody.innerHTML = "";
+      history.forEach(order => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td data-label="ID">${order.id}</td>
+          <td data-label="Fecha">${order.date}</td>
+          <td data-label="Depósito">${order.deposit}</td>
+          <td data-label="Total Items">${order.items}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Inicializar
+    window.onload = () => {
+      loadHistory();
+    };
+  </script>
+</body>
+</html>
