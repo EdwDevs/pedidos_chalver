@@ -83,7 +83,6 @@
         .toast-container {
             z-index: 1100;
         }
-        /* Style for Accordion Header */
         .accordion-button {
             font-weight: 600;
         }
@@ -198,11 +197,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <script type="module">
-        // 1. Importar las funciones necesarias de los SDK de Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
-        // 2. Tu configuración de Firebase
         const firebaseConfig = {
           apiKey: "AIzaSyBMjHvxS-GmiSbJiQKAWUrwnG8oJKphLh8",
           authDomain: "gestor-pedidos-movil.firebaseapp.com",
@@ -212,13 +209,11 @@
           appId: "1:628865028041:web:73d3e824aff6778fe36218"
         };
 
-        // 3. Inicializar Firebase y Firestore
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- El resto del código de la aplicación ---
         const products = [
-             { id: 1, ref: 'AIRMAX HFC 200DS (1+1)', name: 'AIRMAX AEROSOL HFC X 200DOSIS (1+1)', principle: 'SALBUTAMOL' },
+            { id: 1, ref: 'AIRMAX HFC 200DS (1+1)', name: 'AIRMAX AEROSOL HFC X 200DOSIS (1+1)', principle: 'SALBUTAMOL' },
             { id: 2, ref: 'AIRMAX HFC 200DS', name: 'AIRMAX AEROSOL HFC X 200DOSIS', principle: 'SALBUTAMOL' },
             { id: 3, ref: 'ASPROMIO AEROSOL 200DS', name: 'ASPROMIO AEROSOL X 200 DOSIS', principle: 'B.IPRATROPIO' },
             { id: 4, ref: 'BIFIDOLAC 170MG X 6SOB', name: 'BIFIDOLAC 170MG X 6SOB', principle: 'LACTOBACILO' },
@@ -364,10 +359,6 @@
             updateUIState();
         };
 
-        /**
-         * ## NUEVA LÓGICA DE RENDERIZADO DEL HISTORIAL ##
-         * Esta función ahora agrupa los pedidos por cliente y los muestra en un acordeón.
-         */
         const renderAllOrders = () => {
             orderHistoryContainerEl.innerHTML = '';
             if (orders.length === 0) {
@@ -375,7 +366,6 @@
                 return;
             }
 
-            // 1. Agrupar pedidos por cliente
             const groupedOrders = orders.reduce((acc, order) => {
                 const clientName = order.clientName || "Cliente Desconocido";
                 if (!acc[clientName]) {
@@ -385,7 +375,6 @@
                 return acc;
             }, {});
 
-            // 2. Crear un acordeón para cada cliente
             const sortedClients = Object.keys(groupedOrders).sort();
             
             sortedClients.forEach((clientName, index) => {
@@ -405,12 +394,11 @@
                     <div id="${accordionItemId}" class="accordion-collapse collapse" data-bs-parent="#orderHistoryContainer">
                         <div class="accordion-body p-0">
                             <div class="list-group list-group-flush">
-                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
-
-                // 3. Llenar cada acordeón con los pedidos individuales
+                
                 const listGroup = accordionItem.querySelector('.list-group');
                 clientOrders.forEach(order => {
                     const orderItem = document.createElement('div');
@@ -472,20 +460,60 @@
             renderCurrentOrder();
         };
 
+        /**
+         * ## LÓGICA DE GUARDADO ACTUALIZADA ##
+         * Busca un pedido existente del mismo día para el cliente y depósito.
+         * Si lo encuentra, lo actualiza. Si no, crea uno nuevo.
+         */
         finalizeOrderBtn.addEventListener('click', async () => {
-            const newOrder = {
-                ...currentOrder,
-                date: serverTimestamp()
-            };
+            const today = new Date();
+            const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+            const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+            const ordersRef = collection(db, 'orders');
+            const q = query(ordersRef, 
+                where("clientName", "==", currentOrder.clientName),
+                where("supplier", "==", currentOrder.supplier),
+                where("date", ">=", startOfDay),
+                where("date", "<=", endOfDay)
+            );
+            
             try {
-                const docRef = await addDoc(collection(db, 'orders'), newOrder);
-                console.log("Pedido guardado con ID: ", docRef.id);
-                alert(`Pedido para ${newOrder.clientName} guardado con éxito.`);
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    // No hay pedido hoy para este cliente/depósito, CREA UNO NUEVO
+                    console.log("Creando nuevo pedido...");
+                    const newOrder = { ...currentOrder, date: serverTimestamp() };
+                    await addDoc(ordersRef, newOrder);
+                    alert(`Nuevo pedido para ${currentOrder.clientName} guardado con éxito.`);
+                } else {
+                    // Ya existe un pedido, ACTUALÍZALO
+                    console.log("Actualizando pedido existente...");
+                    const existingOrderDoc = querySnapshot.docs[0];
+                    const existingItems = existingOrderDoc.data().items;
+
+                    // Fusionar items nuevos con los existentes
+                    currentOrder.items.forEach(newItem => {
+                        const existingItem = existingItems.find(item => item.productId === newItem.productId);
+                        if (existingItem) {
+                            existingItem.quantity += newItem.quantity; // Suma la cantidad si el producto ya existe
+                        } else {
+                            existingItems.push(newItem); // Agrega el producto si es nuevo
+                        }
+                    });
+
+                    const orderRef = doc(db, "orders", existingOrderDoc.id);
+                    await updateDoc(orderRef, { items: existingItems });
+                    alert(`Pedido para ${currentOrder.clientName} actualizado con éxito.`);
+                }
+
                 cartModal.hide();
                 resetCurrentOrder();
+
             } catch (error) {
                 console.error("Error al guardar el pedido: ", error);
-                alert("Hubo un error al guardar el pedido. Inténtalo de nuevo.");
+                alert("Hubo un error al guardar. Revisa la consola para más detalles.");
             }
         });
 
@@ -496,7 +524,6 @@
                 querySnapshot.forEach((doc) => {
                     orders.push({ id: doc.id, ...doc.data() });
                 });
-                // Llamamos a la función de renderizado que ahora agrupa los pedidos
                 renderAllOrders(); 
             });
         };
@@ -532,7 +559,6 @@
         
         document.getElementById('nav-history-tab').addEventListener('shown.bs.tab', renderAllOrders);
 
-        // --- Inicialización ---
         renderProducts();
         renderCurrentOrder();
         loadRealtimeData();
@@ -540,4 +566,3 @@
 
 </body>
 </html>
-
