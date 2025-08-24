@@ -219,7 +219,7 @@
         const db = getFirestore(app);
 
         const products = [
-            { id: 1, ref: 'AIRMAX HFC 200DS (1+1)', name: 'AIRMAX AEROSOL HFC X 200DOSIS (1+1)', principle: 'SALBUTAMOL' },
+             { id: 1, ref: 'AIRMAX HFC 200DS (1+1)', name: 'AIRMAX AEROSOL HFC X 200DOSIS (1+1)', principle: 'SALBUTAMOL' },
             { id: 2, ref: 'AIRMAX HFC 200DS', name: 'AIRMAX AEROSOL HFC X 200DOSIS', principle: 'SALBUTAMOL' },
             { id: 3, ref: 'ASPROMIO AEROSOL 200DS', name: 'ASPROMIO AEROSOL X 200 DOSIS', principle: 'B.IPRATROPIO' },
             { id: 4, ref: 'BIFIDOLAC 170MG X 6SOB', name: 'BIFIDOLAC 170MG X 6SOB', principle: 'LACTOBACILO' },
@@ -249,7 +249,7 @@
             { id: 28, ref: 'FYNEXIN GEL 5% X 20GR', name: 'FYNEXIN GEL 5% X 20GR', principle: 'IBUPROFENO' },
             { id: 29, ref: 'HYGIENEX ANTIPIOJOS X 24S/S', name: 'HYGIENEX ANTIPIOJOS X 24S/S', principle: 'CIPERMETRINA' },
             { id: 30, ref: 'INFLABON 200MCG HFC AEROSOL', name: 'INFLABON 200MCG HFC AEROSOL', principle: 'BUDESONIDA' },
-            { id: 31, ref: 'INFLABON 50MCG HFC AEROSOL', name: 'INFLABON 50MCG HFC AEROSOL', principle: 'BUDESONIDA' },
+            { id: 31, ref: 'INFLABON 50MCG HFC AEROSOL', name: 'INFLABON 50MCG HFC AEROSOL', principle: 'BUDESONida' },
             { id: 32, ref: 'INFLACOR 4 MG AMP X 1ML', name: 'INFLACOR 4 MG AMP X 1ML', principle: 'BETAMETASONA' },
             { id: 33, ref: 'INFLACOR 8 MG AMP X 2ML', name: 'INFLACOR 8 MG AMP X 2ML', principle: 'BETAMETASONA' },
             { id: 34, ref: 'INFLACOR RET 3/3MG AMP X 1ML', name: 'INFLACOR RET 3/3MG AMP X 1ML', principle: 'BETAMETASONA' },
@@ -408,8 +408,6 @@
                 
                 const listGroup = accordionItem.querySelector('.list-group');
                 clientOrders.forEach(order => {
-                    // ## CAMBIO REALIZADO AQUÍ ##
-                    // Se crea una lista <ul> para los productos en lugar de un texto simple.
                     const itemsHtml = order.items.map(item => {
                         const product = products.find(p => p.id === item.productId);
                         return `<li class="small text-muted ps-2"> • ${product?.ref || 'N/A'} - <strong>Cant: ${item.quantity}</strong></li>`;
