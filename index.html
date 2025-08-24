@@ -3,111 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Pedidos y CRM Farmacéutico</title>
+    <title>Pedidos Móvil</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
         :root {
-            --bs-primary-rgb: 8, 107, 133;
-            --bs-secondary-rgb: 108, 117, 125;
+            --bs-primary-rgb: 0, 123, 255;
+            --bs-body-bg: #f4f7f6;
         }
-
         body {
-            background-color: #f0f2f5;
-            font-size: 0.9rem;
+            background-color: var(--bs-body-bg);
+            padding-bottom: 80px; /* Space for the bottom nav */
         }
-
         .main-header {
             background-color: #fff;
             border-bottom: 1px solid #dee2e6;
-            padding: 0.8rem 1rem;
         }
-
         .card {
             border: none;
-            box-shadow: 0 0 15px rgba(0,0,0,0.05);
-            height: 100%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
         }
-
-        .card-header {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-            font-weight: 600;
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+            border-color: rgba(var(--bs-primary-rgb), 0.5);
         }
-        
-        #productListContainer, #orderHistoryContainer {
-            max-height: calc(100vh - 300px);
+        .product-list-container {
+            max-height: calc(100vh - 350px);
             overflow-y: auto;
         }
 
-        .product-row:hover, .order-history-item:hover {
-            background-color: #e9ecef;
-            cursor: pointer;
+        /* Bottom Navigation Tabs */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            border-top: 1px solid #dee2e6;
+            z-index: 1030;
+            padding: 0.5rem 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        .bottom-nav .nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+        .bottom-nav .nav-link.active {
+            color: rgb(var(--bs-primary-rgb));
+        }
+        .bottom-nav .nav-link i {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
         }
 
-        .form-control:focus, .form-select:focus {
-            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
-            border-color: rgba(var(--bs-primary-rgb), 0.5);
-        }
-
-        .btn-primary {
+        /* Floating Action Button (FAB) for Cart */
+        .fab-cart {
+            position: fixed;
+            bottom: 80px; /* Above bottom nav */
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
             background-color: rgb(var(--bs-primary-rgb));
-            border-color: rgb(var(--bs-primary-rgb));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1040;
+            border: none;
         }
-        .btn-primary:hover {
-            opacity: 0.9;
-            background-color: rgb(var(--bs-primary-rgb));
-            border-color: rgb(var(--bs-primary-rgb));
-        }
-
-        .sticky-top {
-            top: 15px; /* Margin from top */
-        }
-        
-        .badge {
-            font-size: 0.8em;
+        .fab-cart .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
         }
     </style>
 </head>
 <body>
 
-    <header class="main-header d-flex justify-content-between align-items-center sticky-top bg-light">
-        <h4 class="mb-0"><i class="fa-solid fa-pills text-primary"></i> Sistema de Pedidos y CRM</h4>
-        <div id="currentTime" class="text-secondary fw-bold"></div>
+    <header class="main-header p-3 text-center sticky-top">
+        <h5 class="mb-0 fw-bold"><i class="fa-solid fa-pills text-primary"></i> Gestor de Pedidos</h5>
     </header>
 
     <main class="container-fluid mt-3">
-        <div class="row g-3">
-            <div class="col-lg-3">
-                <div class="card">
-                    <div class="card-header"><i class="fa-solid fa-users me-2"></i>Gestión de Cliente</div>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="create-order-tab" role="tabpanel">
+                <div class="card mb-3">
                     <div class="card-body">
                         <div class="mb-3">
-                            <label for="clientSelect" class="form-label">Seleccionar Cliente:</label>
-                            <div class="input-group">
-                                <select class="form-select" id="clientSelect">
-                                    <option selected disabled>-- Ningún cliente seleccionado --</option>
-                                </select>
-                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#addClientModal" title="Agregar Nuevo Cliente">
-                                    <i class="fa-solid fa-user-plus"></i>
-                                </button>
-                            </div>
+                            <label for="clientNameInput" class="form-label fw-bold">Nombre del Cliente:</label>
+                            <input type="text" class="form-control" id="clientNameInput" placeholder="Ej: Droguería La Principal">
                         </div>
-                        <div id="clientDetails" class="p-3 bg-light rounded" style="display: none;">
-                            <h6 class="mb-1" id="clientName"></h6>
-                            <small class="text-muted d-block" id="clientNit"></small>
-                            <small class="text-muted d-block" id="clientAddress"></small>
-                            <small class="text-muted d-block" id="clientPhone"></small>
-                        </div>
-
-                        <hr>
-                        
-                        <div class="mb-3">
-                            <label for="supplierSelect" class="form-label">Seleccionar Depósito:</label>
+                        <div>
+                            <label for="supplierSelect" class="form-label fw-bold">Depósito:</label>
                             <select class="form-select" id="supplierSelect">
-                                <option selected disabled>-- Seleccione un depósito --</option>
+                                <option value="" selected disabled>-- Seleccione un depósito --</option>
                                 <option value="DROSAN">DROSAN</option>
                                 <option value="UNIDROGAS">UNIDROGAS</option>
                             </select>
@@ -115,132 +112,65 @@
                     </div>
                 </div>
 
-                <div class="card mt-3">
-                    <div class="card-header"><i class="fa-solid fa-history me-2"></i>Historial de Pedidos del Cliente</div>
-                    <div class="card-body p-0">
-                         <div id="orderHistoryContainer" class="list-group list-group-flush">
-                            <div class="list-group-item text-center text-muted">Seleccione un cliente para ver su historial.</div>
-                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-5">
                 <div class="card">
-                    <div class="card-header"><i class="fa-solid fa-boxes-stacked me-2"></i>Catálogo de Productos</div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fa-solid fa-search"></i></span>
-                                <input type="text" id="productSearch" class="form-control" placeholder="Buscar producto por nombre o principio activo...">
-                            </div>
+                    <div class="card-header bg-white">
+                         <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i class="fa-solid fa-search"></i></span>
+                            <input type="text" id="productSearch" class="form-control bg-light border-0" placeholder="Buscar producto...">
                         </div>
-                        <div id="productListContainer">
-                            <table class="table table-hover table-sm">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Referencia</th>
-                                        <th>Principio Activo</th>
-                                        <th class="text-end">Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="productList">
-                                    </tbody>
-                            </table>
-                        </div>
+                    </div>
+                    <div class="card-body p-0 product-list-container">
+                        <div class="list-group list-group-flush" id="productList">
+                           </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-4">
-                <div class="sticky-top">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span><i class="fa-solid fa-cart-shopping me-2"></i>Pedido Actual</span>
-                            <span id="currentOrderInfo" class="badge bg-secondary"></span>
+            <div class="tab-pane fade" id="history-tab" role="tabpanel">
+                <div class="card">
+                     <div class="card-header fw-bold">
+                        <i class="fa-solid fa-history me-2"></i>Historial de Todos los Pedidos
+                     </div>
+                     <div class="list-group list-group-flush" id="orderHistoryContainer">
                         </div>
-                        <div class="card-body">
-                            <div id="currentOrderItems" style="min-height: 200px;">
-                                <div class="text-center text-muted mt-5">Agregue productos desde el catálogo.</div>
-                            </div>
-                        </div>
-                        <div class="card-footer text-end">
-                            <button class="btn btn-danger me-2" id="clearOrderBtn"><i class="fa-solid fa-trash me-1"></i> Limpiar</button>
-                            <button class="btn btn-primary" id="finalizeOrderBtn" disabled><i class="fa-solid fa-check-circle me-1"></i> Finalizar Pedido</button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <div class="modal fade" id="addClientModal" tabindex="-1" aria-labelledby="addClientModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addClientModalLabel">Agregar Nuevo Cliente</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addClientForm">
-                        <div class="mb-3">
-                            <label for="newClientName" class="form-label">Nombre del Cliente</label>
-                            <input type="text" class="form-control" id="newClientName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="newClientNit" class="form-label">NIT / C.C.</label>
-                            <input type="text" class="form-control" id="newClientNit" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="newClientAddress" class="form-label">Dirección</label>
-                            <input type="text" class="form-control" id="newClientAddress">
-                        </div>
-                        <div class="mb-3">
-                            <label for="newClientPhone" class="form-label">Teléfono</label>
-                            <input type="tel" class="form-control" id="newClientPhone">
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Guardar Cliente</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <nav class="bottom-nav">
+        <div class="nav nav-pills nav-fill" id="nav-tab" role="tablist">
+            <a class="nav-link active" id="nav-create-order-tab" data-bs-toggle="tab" href="#create-order-tab" role="tab">
+                <i class="fa-solid fa-plus-circle"></i>
+                Crear Pedido
+            </a>
+            <a class="nav-link" id="nav-history-tab" data-bs-toggle="tab" href="#history-tab" role="tab">
+                <i class="fa-solid fa-list-alt"></i>
+                Historial
+            </a>
         </div>
-    </div>
+    </nav>
     
-    <div class="modal fade" id="viewOrderModal" tabindex="-1" aria-labelledby="viewOrderModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+    <button class="fab-cart" data-bs-toggle="modal" data-bs-target="#cartModal">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span class="badge bg-danger rounded-pill" id="cart-item-count">0</span>
+    </button>
+    
+    <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="viewOrderModalLabel">Detalle del Pedido</h5>
+                    <h5 class="modal-title" id="cartModalLabel">Resumen del Pedido</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Cliente:</strong> <span id="modalOrderClient"></span></p>
-                            <p><strong>Depósito:</strong> <span id="modalOrderSupplier"></span></p>
+                    <div id="currentOrderInfo" class="alert alert-info small"></div>
+                    <div id="currentOrderItems">
                         </div>
-                         <div class="col-md-6 text-md-end">
-                            <p><strong>ID Pedido:</strong> <span id="modalOrderId"></span></p>
-                            <p><strong>Fecha:</strong> <span id="modalOrderDate"></span></p>
-                        </div>
-                    </div>
-                    <hr>
-                    <table class="table table-bordered">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Referencia</th>
-                                <th>Cantidad</th>
-                            </tr>
-                        </thead>
-                        <tbody id="modalOrderItems">
-                            </tbody>
-                    </table>
                 </div>
-                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <div class="modal-footer justify-content-between">
+                    <button class="btn btn-outline-danger" id="clearOrderBtn"><i class="fa-solid fa-trash"></i> Limpiar</button>
+                    <button class="btn btn-primary" id="finalizeOrderBtn" disabled><i class="fa-solid fa-check-circle"></i> Finalizar Pedido</button>
                 </div>
             </div>
         </div>
@@ -251,7 +181,6 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-        // --- DATA ---
         const products = [
             { id: 1, ref: 'AIRMAX HFC 200DS (1+1)', name: 'AIRMAX AEROSOL HFC X 200DOSIS (1+1)', principle: 'SALBUTAMOL' },
             { id: 2, ref: 'AIRMAX HFC 200DS', name: 'AIRMAX AEROSOL HFC X 200DOSIS', principle: 'SALBUTAMOL' },
@@ -311,356 +240,199 @@
             { id: 56, ref: 'ZAKOR SUSP X 30ML', name: 'ZAKOR SUSP X 30ML', principle: 'MEBENDAZOL' },
         ];
 
-        // --- STATE ---
-        let clients = [];
         let orders = [];
         let currentOrder = {
-            clientId: null,
-            supplier: null,
-            items: [] // { productId, quantity }
+            clientName: '',
+            supplier: '',
+            items: []
         };
 
-        // --- DOM Elements ---
         const productListEl = document.getElementById('productList');
         const productSearchEl = document.getElementById('productSearch');
-        const clientSelectEl = document.getElementById('clientSelect');
-        const addClientFormEl = document.getElementById('addClientForm');
-        const clientDetailsEl = document.getElementById('clientDetails');
+        const clientNameInputEl = document.getElementById('clientNameInput');
         const supplierSelectEl = document.getElementById('supplierSelect');
+        const cartItemCountEl = document.getElementById('cart-item-count');
         const currentOrderItemsEl = document.getElementById('currentOrderItems');
+        const currentOrderInfoEl = document.getElementById('currentOrderInfo');
         const finalizeOrderBtn = document.getElementById('finalizeOrderBtn');
         const clearOrderBtn = document.getElementById('clearOrderBtn');
-        const currentOrderInfoEl = document.getElementById('currentOrderInfo');
         const orderHistoryContainerEl = document.getElementById('orderHistoryContainer');
-        const currentTimeEl = document.getElementById('currentTime');
-        const addClientModal = new bootstrap.Modal(document.getElementById('addClientModal'));
-        const viewOrderModal = new bootstrap.Modal(document.getElementById('viewOrderModal'));
+        const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
 
-
-        // --- RENDER FUNCTIONS ---
         const renderProducts = (filter = '') => {
             productListEl.innerHTML = '';
-            const filteredProducts = products.filter(p => 
-                p.ref.toLowerCase().includes(filter) || 
-                p.principle.toLowerCase().includes(filter)
-            );
-
-            if (filteredProducts.length === 0) {
-                 productListEl.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No se encontraron productos.</td></tr>';
-                 return;
+            const lowerCaseFilter = filter.toLowerCase();
+            const filtered = products.filter(p => p.ref.toLowerCase().includes(lowerCaseFilter) || p.principle.toLowerCase().includes(lowerCaseFilter));
+            
+            if (filtered.length === 0) {
+                productListEl.innerHTML = '<div class="list-group-item text-center text-muted">No se encontraron productos.</div>';
+                return;
             }
             
-            filteredProducts.forEach(product => {
-                const tr = document.createElement('tr');
-                tr.className = 'product-row';
-                tr.innerHTML = `
-                    <td>
-                        <strong>${product.ref}</strong><br>
-                        <small class="text-muted">${product.name}</small>
-                    </td>
-                    <td><span class="badge bg-secondary">${product.principle}</span></td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-primary add-product-btn" data-id="${product.id}">
-                           <i class="fa-solid fa-plus"></i> Agregar
-                        </button>
-                    </td>
+            filtered.forEach(product => {
+                const item = document.createElement('div');
+                item.className = 'list-group-item d-flex justify-content-between align-items-center';
+                item.innerHTML = `
+                    <div>
+                        <strong class="d-block">${product.ref}</strong>
+                        <small class="text-muted">${product.principle}</small>
+                    </div>
+                    <button class="btn btn-sm btn-primary add-product-btn" data-id="${product.id}">
+                       <i class="fa-solid fa-plus me-1"></i> Añadir
+                    </button>
                 `;
-                productListEl.appendChild(tr);
-            });
-        };
-        
-        const renderClients = () => {
-            clientSelectEl.innerHTML = '<option selected disabled>-- Ningún cliente seleccionado --</option>';
-            clients.sort((a, b) => a.name.localeCompare(b.name)).forEach(client => {
-                const option = document.createElement('option');
-                option.value = client.id;
-                option.textContent = client.name;
-                clientSelectEl.appendChild(option);
+                productListEl.appendChild(item);
             });
         };
 
         const renderCurrentOrder = () => {
+            currentOrder.clientName = clientNameInputEl.value.trim();
+            currentOrder.supplier = supplierSelectEl.value;
+            
+            const clientInfo = currentOrder.clientName ? currentOrder.clientName : '<em>Cliente no especificado</em>';
+            const supplierInfo = currentOrder.supplier ? currentOrder.supplier : '<em>Depósito no seleccionado</em>';
+            currentOrderInfoEl.innerHTML = `<strong>Cliente:</strong> ${clientInfo}<br><strong>Depósito:</strong> ${supplierInfo}`;
+
+            cartItemCountEl.textContent = currentOrder.items.length;
             currentOrderItemsEl.innerHTML = '';
+            
             if (currentOrder.items.length === 0) {
-                currentOrderItemsEl.innerHTML = '<div class="text-center text-muted mt-5">Agregue productos desde el catálogo.</div>';
+                currentOrderItemsEl.innerHTML = '<p class="text-center text-muted mt-3">El carrito está vacío.</p>';
                 updateUIState();
                 return;
             }
             
-            const table = document.createElement('table');
-            table.className = 'table table-sm';
-            table.innerHTML = `
-                <thead class="table-light">
-                    <tr>
-                        <th>Producto</th>
-                        <th style="width: 100px;">Cantidad</th>
-                        <th class="text-end">Acción</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>`;
-            const tbody = table.querySelector('tbody');
-
+            const list = document.createElement('div');
+            list.className = 'list-group';
             currentOrder.items.forEach(item => {
                 const product = products.find(p => p.id === item.productId);
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${product.ref}</td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm quantity-input" value="${item.quantity}" min="1" data-id="${product.id}">
-                    </td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-danger remove-item-btn" data-id="${product.id}">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </td>
+                const listItem = document.createElement('div');
+                listItem.className = 'list-group-item';
+                listItem.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold me-2">${product.ref}</span>
+                        <div class="d-flex align-items-center">
+                            <input type="number" class="form-control form-control-sm quantity-input me-2" value="${item.quantity}" min="1" data-id="${product.id}" style="width: 70px;">
+                            <button class="btn btn-sm btn-outline-danger remove-item-btn" data-id="${product.id}"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                list.appendChild(listItem);
             });
-            currentOrderItemsEl.appendChild(table);
+            currentOrderItemsEl.appendChild(list);
             updateUIState();
         };
 
-        const renderOrderHistory = (clientId) => {
+        const renderAllOrders = () => {
             orderHistoryContainerEl.innerHTML = '';
-            const clientOrders = orders
-                .filter(o => o.clientId === clientId)
-                .sort((a,b) => new Date(b.date) - new Date(a.date));
+            const sortedOrders = [...orders].sort((a,b) => new Date(b.date) - new Date(a.date));
 
-            if (clientOrders.length === 0) {
-                orderHistoryContainerEl.innerHTML = '<div class="list-group-item text-center text-muted">Este cliente no tiene pedidos.</div>';
+            if (sortedOrders.length === 0) {
+                orderHistoryContainerEl.innerHTML = '<div class="list-group-item text-center text-muted">No hay pedidos guardados.</div>';
                 return;
             }
 
-            clientOrders.forEach(order => {
-                const item = document.createElement('a');
-                item.href = '#';
-                item.className = 'list-group-item list-group-item-action flex-column align-items-start order-history-item';
-                item.dataset.orderId = order.id;
+            sortedOrders.forEach(order => {
+                const item = document.createElement('div');
+                item.className = 'list-group-item';
                 item.innerHTML = `
                     <div class="d-flex w-100 justify-content-between">
-                        <h6 class="mb-1">${order.supplier}</h6>
+                        <h6 class="mb-1">${order.clientName}</h6>
                         <small>${new Date(order.date).toLocaleDateString('es-CO')}</small>
                     </div>
-                    <p class="mb-1">ID: ${order.id}</p>
-                    <small>${order.items.length} producto(s)</small>
+                    <p class="mb-1 small">
+                        <strong>Depósito:</strong> ${order.supplier} | <strong>ID:</strong> ${order.id}
+                    </p>
+                    <small class="text-muted">${order.items.map(i => `${products.find(p=>p.id===i.productId).ref} (x${i.quantity})`).join(', ')}</small>
                 `;
                 orderHistoryContainerEl.appendChild(item);
             });
-        }
-        
+        };
+
         const updateUIState = () => {
-            const client = clients.find(c => c.id === currentOrder.clientId);
-            const supplier = currentOrder.supplier;
-
-            if(client && supplier) {
-                currentOrderInfoEl.textContent = `${client.name} / ${supplier}`;
-                currentOrderInfoEl.className = 'badge bg-primary';
-            } else if (client) {
-                currentOrderInfoEl.textContent = `${client.name} / Sin depósito`;
-                currentOrderInfoEl.className = 'badge bg-warning text-dark';
-            } else if (supplier) {
-                currentOrderInfoEl.textContent = `Sin cliente / ${supplier}`;
-                currentOrderInfoEl.className = 'badge bg-warning text-dark';
-            } else {
-                currentOrderInfoEl.textContent = `Sin cliente / Sin depósito`;
-                currentOrderInfoEl.className = 'badge bg-secondary';
-            }
-
-            const canFinalize = currentOrder.clientId && currentOrder.supplier && currentOrder.items.length > 0;
+            const canFinalize = currentOrder.clientName && currentOrder.supplier && currentOrder.items.length > 0;
             finalizeOrderBtn.disabled = !canFinalize;
         };
         
-        const updateClock = () => {
-            const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-            currentTimeEl.textContent = now.toLocaleDateString('es-CO', options);
-        };
-
-        // --- EVENT HANDLERS ---
-        productSearchEl.addEventListener('input', (e) => renderProducts(e.target.value.toLowerCase()));
-
-        productListEl.addEventListener('click', (e) => {
-            const btn = e.target.closest('.add-product-btn');
-            if (btn) {
-                const productId = parseInt(btn.dataset.id);
-                addProductToOrder(productId);
-            }
-        });
-
-        addClientFormEl.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const newClient = {
-                id: Date.now(),
-                name: document.getElementById('newClientName').value,
-                nit: document.getElementById('newClientNit').value,
-                address: document.getElementById('newClientAddress').value,
-                phone: document.getElementById('newClientPhone').value
-            };
-            clients.push(newClient);
-            saveData();
-            renderClients();
-            clientSelectEl.value = newClient.id;
-            handleClientChange(); // Trigger change to update UI
-            addClientFormEl.reset();
-            addClientModal.hide();
-        });
-
-        clientSelectEl.addEventListener('change', handleClientChange);
-        
-        function handleClientChange() {
-            const clientId = parseInt(clientSelectEl.value);
-            const client = clients.find(c => c.id === clientId);
-            if (client) {
-                clientDetailsEl.style.display = 'block';
-                document.getElementById('clientName').textContent = client.name;
-                document.getElementById('clientNit').textContent = `NIT/CC: ${client.nit}`;
-                document.getElementById('clientAddress').textContent = `Dir: ${client.address}`;
-                document.getElementById('clientPhone').textContent = `Tel: ${client.phone}`;
-                currentOrder.clientId = clientId;
-                renderOrderHistory(clientId);
-            } else {
-                clientDetailsEl.style.display = 'none';
-                currentOrder.clientId = null;
-                orderHistoryContainerEl.innerHTML = '<div class="list-group-item text-center text-muted">Seleccione un cliente para ver su historial.</div>';
-            }
-            updateUIState();
-        }
-
-        supplierSelectEl.addEventListener('change', () => {
-            currentOrder.supplier = supplierSelectEl.value;
-            updateUIState();
-        });
-        
-        currentOrderItemsEl.addEventListener('change', (e) => {
-             if (e.target.classList.contains('quantity-input')) {
-                const productId = parseInt(e.target.dataset.id);
-                const newQuantity = parseInt(e.target.value);
-                updateQuantity(productId, newQuantity);
-            }
-        });
-
-        currentOrderItemsEl.addEventListener('click', (e) => {
-             if (e.target.closest('.remove-item-btn')) {
-                const productId = parseInt(e.target.closest('.remove-item-btn').dataset.id);
-                removeProductFromOrder(productId);
-            }
-        });
-        
-        clearOrderBtn.addEventListener('click', () => {
-            if(confirm('¿Está seguro de que desea limpiar el pedido actual?')) {
-                resetCurrentOrder();
-            }
-        });
-
-        finalizeOrderBtn.addEventListener('click', () => {
-            const clientName = clients.find(c => c.id === currentOrder.clientId).name;
-            if(confirm(`Finalizar pedido para ${clientName} con el depósito ${currentOrder.supplier}?`)) {
-                const newOrder = {
-                    id: 'P-' + Date.now(),
-                    ...currentOrder,
-                    date: new Date().toISOString()
-                };
-                orders.push(newOrder);
-                saveData();
-                alert(`Pedido ${newOrder.id} guardado exitosamente.`);
-                renderOrderHistory(currentOrder.clientId);
-                resetCurrentOrder();
-            }
-        });
-
-        orderHistoryContainerEl.addEventListener('click', (e) => {
-            const orderItem = e.target.closest('.order-history-item');
-            if (orderItem) {
-                const orderId = orderItem.dataset.orderId;
-                const order = orders.find(o => o.id === orderId);
-                showOrderDetails(order);
-            }
-        });
-        
-        // --- LOGIC FUNCTIONS ---
         const addProductToOrder = (productId) => {
-            const existingItem = currentOrder.items.find(item => item.productId === productId);
-            if (existingItem) {
-                existingItem.quantity++;
+            const existing = currentOrder.items.find(item => item.productId === productId);
+            if (existing) {
+                existing.quantity++;
             } else {
                 currentOrder.items.push({ productId, quantity: 1 });
             }
             renderCurrentOrder();
         };
 
-        const removeProductFromOrder = (productId) => {
-            currentOrder.items = currentOrder.items.filter(item => item.productId !== productId);
-            renderCurrentOrder();
-        };
-        
-        const updateQuantity = (productId, newQuantity) => {
-            const item = currentOrder.items.find(item => item.productId === productId);
-            if(item && newQuantity > 0) {
-                item.quantity = newQuantity;
-            } else { // if quantity is 0 or less, remove it
-                removeProductFromOrder(productId);
+        const handleOrderAction = (e) => {
+            const target = e.target;
+            if (target.closest('.remove-item-btn')) {
+                const productId = parseInt(target.closest('.remove-item-btn').dataset.id);
+                currentOrder.items = currentOrder.items.filter(i => i.productId !== productId);
+                renderCurrentOrder();
+            } else if (target.classList.contains('quantity-input')) {
+                const productId = parseInt(target.dataset.id);
+                const newQuantity = parseInt(target.value);
+                const item = currentOrder.items.find(i => i.productId === productId);
+                if (item && newQuantity > 0) {
+                    item.quantity = newQuantity;
+                } else { // Remove if invalid quantity
+                    currentOrder.items = currentOrder.items.filter(i => i.productId !== productId);
+                }
+                renderCurrentOrder();
             }
-            renderCurrentOrder(); // Rerender to reflect potential removal
         };
 
         const resetCurrentOrder = () => {
-            currentOrder.items = [];
-            // Keep client and supplier selected for convenience
-            // currentOrder.clientId = null;
-            // currentOrder.supplier = null;
-            // clientSelectEl.value = '-- Ningún cliente seleccionado --';
-            // supplierSelectEl.value = '-- Seleccione un depósito --';
-            // clientDetailsEl.style.display = 'none';
+            currentOrder = { clientName: '', supplier: '', items: [] };
+            clientNameInputEl.value = '';
+            supplierSelectEl.value = '';
             renderCurrentOrder();
-            updateUIState();
         };
         
-        const showOrderDetails = (order) => {
-            const client = clients.find(c => c.id === order.clientId);
-            document.getElementById('modalOrderClient').textContent = client ? client.name : 'N/A';
-            document.getElementById('modalOrderSupplier').textContent = order.supplier;
-            document.getElementById('modalOrderId').textContent = order.id;
-            document.getElementById('modalOrderDate').textContent = new Date(order.date).toLocaleString('es-CO');
-            
-            const itemsTbody = document.getElementById('modalOrderItems');
-            itemsTbody.innerHTML = '';
-            order.items.forEach(item => {
-                const product = products.find(p => p.id === item.productId);
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${product ? product.ref : 'Producto no encontrado'}</td>
-                    <td>${item.quantity}</td>
-                `;
-                itemsTbody.appendChild(tr);
-            });
-
-            viewOrderModal.show();
-        }
-
-        // --- LOCAL STORAGE ---
-        const saveData = () => {
-            localStorage.setItem('crm_clients', JSON.stringify(clients));
-            localStorage.setItem('crm_orders', JSON.stringify(orders));
-        };
-
+        const saveData = () => localStorage.setItem('mobile_orders', JSON.stringify(orders));
         const loadData = () => {
-            const storedClients = localStorage.getItem('crm_clients');
-            const storedOrders = localStorage.getItem('crm_orders');
-            if (storedClients) clients = JSON.parse(storedClients);
-            if (storedOrders) orders = JSON.parse(storedOrders);
+            const data = localStorage.getItem('mobile_orders');
+            if (data) orders = JSON.parse(data);
         };
+        
+        // --- Event Listeners ---
+        productSearchEl.addEventListener('input', (e) => renderProducts(e.target.value));
+        productListEl.addEventListener('click', (e) => {
+            const btn = e.target.closest('.add-product-btn');
+            if (btn) addProductToOrder(parseInt(btn.dataset.id));
+        });
+        
+        [clientNameInputEl, supplierSelectEl].forEach(el => el.addEventListener('change', renderCurrentOrder));
+        currentOrderItemsEl.addEventListener('click', handleOrderAction);
+        currentOrderItemsEl.addEventListener('change', handleOrderAction);
+        
+        clearOrderBtn.addEventListener('click', () => {
+            if (confirm('¿Limpiar todo el pedido actual?')) {
+                resetCurrentOrder();
+            }
+        });
+        
+        finalizeOrderBtn.addEventListener('click', () => {
+            const newOrder = {
+                id: 'P-' + Date.now(),
+                ...currentOrder,
+                date: new Date().toISOString()
+            };
+            orders.push(newOrder);
+            saveData();
+            alert(`Pedido para ${newOrder.clientName} guardado con éxito.`);
+            cartModal.hide();
+            resetCurrentOrder();
+        });
+        
+        // Refresh history when tab is shown
+        document.getElementById('nav-history-tab').addEventListener('shown.bs.tab', renderAllOrders);
 
-        // --- INITIALIZATION ---
-        const init = () => {
-            loadData();
-            renderProducts();
-            renderClients();
-            updateUIState();
-            updateClock();
-            setInterval(updateClock, 1000); // Update clock every second
-        };
-
-        init();
+        // --- Init ---
+        loadData();
+        renderProducts();
+        renderCurrentOrder();
     });
     </script>
 </body>
