@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedidos Móvil</title>
     
-    <!-- Bootstrap 5.3.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome 6.5.2 for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
@@ -82,19 +80,20 @@
             top: -5px;
             right: -5px;
         }
+        /* Toast Notification Styling */
+        .toast-container {
+            z-index: 1100;
+        }
     </style>
 </head>
 <body>
 
-    <!-- El HTML del body (header, main, nav, fab-cart, modal) no cambia. -->
-    <!-- Lo he omitido aquí para ser breve, pero debe permanecer en tu archivo. -->
     <header class="main-header p-3 text-center sticky-top">
         <h5 class="mb-0 fw-bold"><i class="fa-solid fa-pills text-primary"></i> Gestor de Pedidos</h5>
     </header>
 
     <main class="container-fluid mt-3">
         <div class="tab-content" id="myTabContent">
-            <!-- Tab 1: Crear Pedido -->
             <div class="tab-pane fade show active" id="create-order-tab" role="tabpanel">
                 <div class="card mb-3">
                     <div class="card-body">
@@ -122,27 +121,23 @@
                     </div>
                     <div class="card-body p-0 product-list-container">
                         <div class="list-group list-group-flush" id="productList">
-                           <!-- Product list rendered by JS -->
-                        </div>
+                           </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 2: Historial General -->
             <div class="tab-pane fade" id="history-tab" role="tabpanel">
                 <div class="card">
                      <div class="card-header fw-bold">
                         <i class="fa-solid fa-history me-2"></i>Historial de Todos los Pedidos
                      </div>
                      <div class="list-group list-group-flush" id="orderHistoryContainer">
-                        <!-- History rendered by JS -->
-                     </div>
+                        </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Bottom Navigation -->
     <nav class="bottom-nav">
         <div class="nav nav-pills nav-fill" id="nav-tab" role="tablist">
             <a class="nav-link active" id="nav-create-order-tab" data-bs-toggle="tab" href="#create-order-tab" role="tab">
@@ -156,13 +151,11 @@
         </div>
     </nav>
     
-    <!-- Floating Cart Button -->
     <button class="fab-cart" data-bs-toggle="modal" data-bs-target="#cartModal">
         <i class="fa-solid fa-cart-shopping"></i>
         <span class="badge bg-danger rounded-pill" id="cart-item-count">0</span>
     </button>
     
-    <!-- Cart Modal -->
     <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
@@ -173,8 +166,7 @@
                 <div class="modal-body">
                     <div id="currentOrderInfo" class="alert alert-info small"></div>
                     <div id="currentOrderItems">
-                        <!-- Cart items rendered by JS -->
-                    </div>
+                        </div>
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button class="btn btn-outline-danger" id="clearOrderBtn"><i class="fa-solid fa-trash"></i> Limpiar</button>
@@ -184,17 +176,26 @@
         </div>
     </div>
 
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fa-solid fa-check-circle text-success me-2"></i>
+                <strong class="me-auto">Notificación</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toast-body-content">
+                </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- =============================================================================== -->
-    <!-- ======================= SECCIÓN DE JAVASCRIPT ACTUALIZADA ======================= -->
-    <!-- =============================================================================== -->
     <script type="module">
         // 1. Importar las funciones necesarias de los SDK de Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
-        // 2. Tu configuración de Firebase (la que pegaste)
+        // 2. Tu configuración de Firebase
         const firebaseConfig = {
           apiKey: "AIzaSyBMjHvxS-GmiSbJiQKAWUrwnG8oJKphLh8",
           authDomain: "gestor-pedidos-movil.firebaseapp.com",
@@ -281,6 +282,13 @@
         const clearOrderBtn = document.getElementById('clearOrderBtn');
         const orderHistoryContainerEl = document.getElementById('orderHistoryContainer');
         const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
+        const liveToast = new bootstrap.Toast(document.getElementById('liveToast'));
+        const toastBody = document.getElementById('toast-body-content');
+
+        const showToast = (message) => {
+            toastBody.textContent = message;
+            liveToast.show();
+        };
 
         const renderProducts = (filter = '') => {
             productListEl.innerHTML = '';
@@ -300,9 +308,12 @@
                         <strong class="d-block">${product.ref}</strong>
                         <small class="text-muted">${product.principle}</small>
                     </div>
-                    <button class="btn btn-sm btn-primary add-product-btn" data-id="${product.id}">
-                       <i class="fa-solid fa-plus me-1"></i> Añadir
-                    </button>
+                    <div class="input-group input-group-sm" style="width: 120px;">
+                        <input type="number" class="form-control quantity-to-add" placeholder="Cant." min="1" aria-label="Cantidad">
+                        <button class="btn btn-primary add-product-btn" data-id="${product.id}">
+                           <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
                 `;
                 productListEl.appendChild(item);
             });
@@ -375,13 +386,15 @@
             finalizeOrderBtn.disabled = !canFinalize;
         };
         
-        const addProductToOrder = (productId) => {
+        const addProductToOrder = (productId, quantity) => {
             const existing = currentOrder.items.find(item => item.productId === productId);
             if (existing) {
-                existing.quantity++;
+                existing.quantity += quantity;
             } else {
-                currentOrder.items.push({ productId, quantity: 1 });
+                currentOrder.items.push({ productId, quantity });
             }
+            const productRef = products.find(p => p.id === productId).ref;
+            showToast(`Se agregaron ${quantity} de ${productRef}`);
             renderCurrentOrder();
         };
 
@@ -411,13 +424,11 @@
             renderCurrentOrder();
         };
 
-        // --- Evento para finalizar pedido con Firestore v9 ---
         finalizeOrderBtn.addEventListener('click', async () => {
             const newOrder = {
                 ...currentOrder,
-                date: serverTimestamp() // Usamos la fecha del servidor
+                date: serverTimestamp()
             };
-
             try {
                 const docRef = await addDoc(collection(db, 'orders'), newOrder);
                 console.log("Pedido guardado con ID: ", docRef.id);
@@ -430,7 +441,6 @@
             }
         });
 
-        // --- Cargar datos en tiempo real desde Firestore v9 ---
         const loadRealtimeData = () => {
             const q = query(collection(db, "orders"), orderBy("date", "desc"));
             onSnapshot(q, (querySnapshot) => {
@@ -442,11 +452,23 @@
             });
         };
 
-        // --- Event Listeners ---
         productSearchEl.addEventListener('input', (e) => renderProducts(e.target.value));
+        
         productListEl.addEventListener('click', (e) => {
             const btn = e.target.closest('.add-product-btn');
-            if (btn) addProductToOrder(parseInt(btn.dataset.id));
+            if (btn) {
+                const container = btn.closest('.input-group');
+                const quantityInput = container.querySelector('.quantity-to-add');
+                const quantity = parseInt(quantityInput.value);
+                const productId = parseInt(btn.dataset.id);
+
+                if (quantity > 0) {
+                    addProductToOrder(productId, quantity);
+                    quantityInput.value = '';
+                } else {
+                    alert('Por favor, ingrese una cantidad válida.');
+                }
+            }
         });
         
         [clientNameInputEl, supplierSelectEl].forEach(el => el.addEventListener('change', renderCurrentOrder));
