@@ -80,9 +80,16 @@
             top: -5px;
             right: -5px;
         }
-        /* Toast Notification Styling */
         .toast-container {
             z-index: 1100;
+        }
+        /* Style for Accordion Header */
+        .accordion-button {
+            font-weight: 600;
+        }
+        .accordion-button:not(.collapsed) {
+           background-color: rgba(var(--bs-primary-rgb), 0.1);
+           color: #000;
         }
     </style>
 </head>
@@ -129,9 +136,9 @@
             <div class="tab-pane fade" id="history-tab" role="tabpanel">
                 <div class="card">
                      <div class="card-header fw-bold">
-                        <i class="fa-solid fa-history me-2"></i>Historial de Todos los Pedidos
+                        <i class="fa-solid fa-file-invoice me-2"></i>Pedidos por Cliente
                      </div>
-                     <div class="list-group list-group-flush" id="orderHistoryContainer">
+                     <div class="accordion" id="orderHistoryContainer">
                         </div>
                 </div>
             </div>
@@ -211,7 +218,7 @@
 
         // --- El resto del código de la aplicación ---
         const products = [
-            { id: 1, ref: 'AIRMAX HFC 200DS (1+1)', name: 'AIRMAX AEROSOL HFC X 200DOSIS (1+1)', principle: 'SALBUTAMOL' },
+             { id: 1, ref: 'AIRMAX HFC 200DS (1+1)', name: 'AIRMAX AEROSOL HFC X 200DOSIS (1+1)', principle: 'SALBUTAMOL' },
             { id: 2, ref: 'AIRMAX HFC 200DS', name: 'AIRMAX AEROSOL HFC X 200DOSIS', principle: 'SALBUTAMOL' },
             { id: 3, ref: 'ASPROMIO AEROSOL 200DS', name: 'ASPROMIO AEROSOL X 200 DOSIS', principle: 'B.IPRATROPIO' },
             { id: 4, ref: 'BIFIDOLAC 170MG X 6SOB', name: 'BIFIDOLAC 170MG X 6SOB', principle: 'LACTOBACILO' },
@@ -357,27 +364,68 @@
             updateUIState();
         };
 
+        /**
+         * ## NUEVA LÓGICA DE RENDERIZADO DEL HISTORIAL ##
+         * Esta función ahora agrupa los pedidos por cliente y los muestra en un acordeón.
+         */
         const renderAllOrders = () => {
             orderHistoryContainerEl.innerHTML = '';
             if (orders.length === 0) {
-                orderHistoryContainerEl.innerHTML = '<div class="list-group-item text-center text-muted">No hay pedidos guardados.</div>';
+                orderHistoryContainerEl.innerHTML = '<div class="p-3 text-center text-muted">No hay pedidos guardados.</div>';
                 return;
             }
 
-            orders.forEach(order => {
-                const item = document.createElement('div');
-                item.className = 'list-group-item';
-                item.innerHTML = `
-                    <div class="d-flex w-100 justify-content-between">
-                        <h6 class="mb-1">${order.clientName}</h6>
-                        <small>${order.date ? order.date.toDate().toLocaleDateString('es-CO') : 'Fecha pendiente'}</small>
+            // 1. Agrupar pedidos por cliente
+            const groupedOrders = orders.reduce((acc, order) => {
+                const clientName = order.clientName || "Cliente Desconocido";
+                if (!acc[clientName]) {
+                    acc[clientName] = [];
+                }
+                acc[clientName].push(order);
+                return acc;
+            }, {});
+
+            // 2. Crear un acordeón para cada cliente
+            const sortedClients = Object.keys(groupedOrders).sort();
+            
+            sortedClients.forEach((clientName, index) => {
+                const clientOrders = groupedOrders[clientName];
+                const accordionItemId = `client-collapse-${index}`;
+                
+                const accordionItem = document.createElement('div');
+                accordionItem.className = 'accordion-item';
+
+                accordionItem.innerHTML = `
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${accordionItemId}">
+                            ${clientName}
+                            <span class="badge bg-secondary ms-auto">${clientOrders.length} Pedido(s)</span>
+                        </button>
+                    </h2>
+                    <div id="${accordionItemId}" class="accordion-collapse collapse" data-bs-parent="#orderHistoryContainer">
+                        <div class="accordion-body p-0">
+                            <div class="list-group list-group-flush">
+                                </div>
+                        </div>
                     </div>
-                    <p class="mb-1 small">
-                        <strong>Depósito:</strong> ${order.supplier}
-                    </p>
-                    <small class="text-muted">${order.items.map(i => `${products.find(p=>p.id===i.productId)?.ref || 'N/A'} (x${i.quantity})`).join(', ')}</small>
                 `;
-                orderHistoryContainerEl.appendChild(item);
+
+                // 3. Llenar cada acordeón con los pedidos individuales
+                const listGroup = accordionItem.querySelector('.list-group');
+                clientOrders.forEach(order => {
+                    const orderItem = document.createElement('div');
+                    orderItem.className = 'list-group-item';
+                    orderItem.innerHTML = `
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Pedido del ${order.date ? order.date.toDate().toLocaleDateString('es-CO') : 'N/A'}</h6>
+                            <small>Depósito: <strong>${order.supplier}</strong></small>
+                        </div>
+                        <small class="text-muted">${order.items.map(i => `${products.find(p=>p.id===i.productId)?.ref || 'N/A'} (x${i.quantity})`).join(', ')}</small>
+                    `;
+                    listGroup.appendChild(orderItem);
+                });
+
+                orderHistoryContainerEl.appendChild(accordionItem);
             });
         };
         
@@ -448,6 +496,7 @@
                 querySnapshot.forEach((doc) => {
                     orders.push({ id: doc.id, ...doc.data() });
                 });
+                // Llamamos a la función de renderizado que ahora agrupa los pedidos
                 renderAllOrders(); 
             });
         };
@@ -491,3 +540,4 @@
 
 </body>
 </html>
+
