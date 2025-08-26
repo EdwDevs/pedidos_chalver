@@ -176,6 +176,8 @@
                     <div id="currentOrderInfo" class="alert alert-info small"></div>
                     <div id="currentOrderItems">
                         </div>
+                    <hr>
+                    <div id="cart-total" class="fs-5 fw-bold text-end"></div>
                 </div>
                 <div class="modal-footer justify-content-between">
                     <div>
@@ -204,7 +206,7 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy, where, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBMjHvxS-GmiSbJiQKAWUrwnG8oJKphLh8",
@@ -219,62 +221,62 @@
         const db = getFirestore(app);
 
         const products = [
-             { id: 1, ref: 'AIRMAX HFC 200DS (1+1)', name: 'AIRMAX AEROSOL HFC X 200DOSIS (1+1)', principle: 'SALBUTAMOL' },
-            { id: 2, ref: 'AIRMAX HFC 200DS', name: 'AIRMAX AEROSOL HFC X 200DOSIS', principle: 'SALBUTAMOL' },
-            { id: 3, ref: 'ASPROMIO AEROSOL 200DS', name: 'ASPROMIO AEROSOL X 200 DOSIS', principle: 'B.IPRATROPIO' },
-            { id: 4, ref: 'BIFIDOLAC 170MG X 6SOB', name: 'BIFIDOLAC 170MG X 6SOB', principle: 'LACTOBACILO' },
-            { id: 5, ref: 'BUSTEROL AEROSOL 200DS', name: 'BUSTEROL AEROSOL HFC X 200 DOSIS', principle: 'BUDESONIDA + FORMOTEROL' },
-            { id: 6, ref: 'CLOBEZAN CR X 25GR', name: 'CLOBEZAN CR X 25GR', principle: 'CLOBETASOL' },
-            { id: 7, ref: 'CLOBEZAN LOCION X 60ML', name: 'CLOBEZAN LOCION X 60ML', principle: 'CLOBETASOL' },
-            { id: 8, ref: 'CLOBEZAN UNG X 25GR', name: 'CLOBEZAN UNG X 25GR', principle: 'CLOBETASOL' },
-            { id: 9, ref: 'CUTAMYCON 500 X 1CBG', name: 'CUTAMYCON 500 X 1CBG', principle: 'CLOTRIMAZOL' },
-            { id: 10, ref: 'CUTAMYCON CR TOPICA X 20GR', name: 'CUTAMYCON CR TOPICA X 20GR', principle: 'CLOTRIMAZOL' },
-            { id: 11, ref: 'DESCONGEL F JBE X 60ML', name: 'DESCONGEL F JBE X 60ML', principle: 'FENILEFRINA + CETIRIZINA' },
-            { id: 12, ref: 'DESCONGEL GRIPA X 10CBG', name: 'DESCONGEL GRIPA X 10CBG', principle: 'FENILEFRINA + CETIRIZINA' },
-            { id: 13, ref: 'DESCONGEL LS X 100CAP', name: 'DESCONGEL LS X 100CAP', principle: 'FENILEFRINA + CETIRIZINA' },
-            { id: 14, ref: 'DESCONGELITO F GOTAS X 15ML', name: 'DESCONGELITO F GOTAS X 15ML', principle: 'FENILEFRINA + CETIRIZINA' },
-            { id: 15, ref: 'DESLORAN 5 MG X 10TBS', name: 'DESLORAN 5 MG X 10TBS', principle: 'DESLORATADINA' },
-            { id: 16, ref: 'DESLORAN JBE 0.05% X 60ML', name: 'DESLORAN JBE 0.05% X 60ML', principle: 'DESLORATADINA' },
-            { id: 17, ref: 'DOLFENAX 200MG X 10CAPS', name: 'DOLFENAX 200MG X 10CAPS', principle: 'A.TOLFENAMICO' },
-            { id: 18, ref: 'DUOPAS 400/20MG X 10TBS', name: 'DUOPAS 400/20MG X 10TBS', principle: 'IBUPROFENO+H.BUTILBROMURO' },
-            { id: 19, ref: 'ESTERMAX 0.625MG CR VAG X40GR', name: 'ESTERMAX 0.625MG CR VAG X40GR', principle: 'ESTROGENOS CONJUGADOS' },
-            { id: 20, ref: 'ESTERMAX 0.625MG X28TBS', name: 'ESTERMAX 0.625MG X28TBS', principle: 'ESTROGENOS CONJUGADOS' },
-            { id: 21, ref: 'FEMTRIOL CR VAG X 20GR', name: 'FEMTRIOL CR VAG X 20GR (5 APLICADOR)', principle: 'ESTRIOL' },
-            { id: 22, ref: 'FLUTURAN X 10CBG', name: 'FLUTURAN X 10CBG', principle: 'IBUPROFENO+DESLORATADINA' },
-            { id: 23, ref: 'FLUZETRIN F GOTAS PED X 15ML', name: 'FLUZETRIN F GOTAS PED X 15ML', principle: 'CETIRIZINA+FENILEFRINA' },
-            { id: 24, ref: 'FLUZETRIN F JBE X 60ML', name: 'FLUZETRIN F JBE X 60ML', principle: 'CETIRIZINA+FENILEFRINA' },
-            { id: 25, ref: 'FLUZETRIN F X 10CAP', name: 'FLUZETRIN F X 10CAP', principle: 'ACETAMINOFEN+CETIRIZINA' },
-            { id: 26, ref: 'FRIOTAN 65MG X 10CAPS', name: 'FRIOTAN 65MG X 10CAPS', principle: 'HEDERA HELIX' },
-            { id: 27, ref: 'FRIOTAN JBE X 120ML', name: 'FRIOTAN JBE X 120ML', principle: 'HEDERA HELIX' },
-            { id: 28, ref: 'FYNEXIN GEL 5% X 20GR', name: 'FYNEXIN GEL 5% X 20GR', principle: 'IBUPROFENO' },
-            { id: 29, ref: 'HYGIENEX ANTIPIOJOS X 24S/S', name: 'HYGIENEX ANTIPIOJOS X 24S/S', principle: 'CIPERMETRINA' },
-            { id: 30, ref: 'INFLABON 200MCG HFC AEROSOL', name: 'INFLABON 200MCG HFC AEROSOL', principle: 'BUDESONIDA' },
-            { id: 31, ref: 'INFLABON 50MCG HFC AEROSOL', name: 'INFLABON 50MCG HFC AEROSOL', principle: 'BUDESONida' },
-            { id: 32, ref: 'INFLACOR 4 MG AMP X 1ML', name: 'INFLACOR 4 MG AMP X 1ML', principle: 'BETAMETASONA' },
-            { id: 33, ref: 'INFLACOR 8 MG AMP X 2ML', name: 'INFLACOR 8 MG AMP X 2ML', principle: 'BETAMETASONA' },
-            { id: 34, ref: 'INFLACOR RET 3/3MG AMP X 1ML', name: 'INFLACOR RET 3/3MG AMP X 1ML', principle: 'BETAMETASONA' },
-            { id: 35, ref: 'INFLACOR RET 6/6MG AMP X 2ML', name: 'INFLACOR RET 6/6MG AMP X 2ML', principle: 'BETAMETASONA' },
-            { id: 36, ref: 'LACTULAX JBE X240ML', name: 'LACTULAX JBE X240ML', principle: 'LACTULOSA' },
-            { id: 37, ref: 'LACTULAX X 12S/S', name: 'LACTULAX X 12S/S', principle: 'LACTULOSA' },
-            { id: 38, ref: 'MULTIDOL 800MG X 30CBG', name: 'MULTIDOL 800MG X 30CBG', principle: 'IBUPROFENO' },
-            { id: 39, ref: 'MULTIDOL EXPRESS 400MG X 48CBG (2+1)', name: 'MULTIDOL EXPRESS 400MG X 48CBG (2+1)', principle: 'IBUPROFENO' },
-            { id: 40, ref: 'MULTIDOL EXPRESS 400MG X 48CBG', name: 'MULTIDOL EXPRESS 400MG X 48CBG', principle: 'IBUPROFENO' },
-            { id: 41, ref: 'NEUROPRON INY 2ML X 3AMP', name: 'NEUROPRON INY 2ML X 3AMP', principle: 'COMPLEJO B' },
-            { id: 42, ref: 'NEUROPRON INY X 2ML (UNIDAD)', name: 'NEUROPRON INY X 2ML (UNIDAD)', principle: 'COMPLEJO B' },
-            { id: 43, ref: 'PARAXIN 500MG X 6TBS', name: 'PARAXIN 500MG X 6TBS', principle: 'NITAZOXANIDA' },
-            { id: 44, ref: 'PARAXIN SUSP X 30ML', name: 'PARAXIN SUSP X 30ML', principle: 'NITAZOXANIDA' },
-            { id: 45, ref: 'SIMPAUSE 100MG X 30CBG', name: 'SIMPAUSE 100MG X 30CBG', principle: 'ISOFLAVONA' },
-            { id: 46, ref: 'TEREX CR VAG X 20GR', name: 'TEREX CR VAG X 20GR+3APLICADORES', principle: 'TERCONAZOL+DEXAMETASONA' },
-            { id: 47, ref: 'TIBONELLA 2.5MG X 28TBS', name: 'TIBONELLA 2.5MG X 28TBS', principle: 'TIBOLONA' },
-            { id: 48, ref: 'TRIGENTAX CR X 20GR', name: 'TRIGENTAX CR X 20GR', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA' },
-            { id: 49, ref: 'TRIGENTAX CR X 40GR', name: 'TRIGENTAX CR X 40GR', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA' },
-            { id: 50, ref: 'TRIGENTAX CR X 40GR X 2 GTS', name: 'TRIGENTAX CR X 40GR X 2 GTS ALCOHOL X 350ML', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA' },
-            { id: 51, ref: 'TRIGENTAX LOC TOP. X 50ML', name: 'TRIGENTAX LOC TOP. X 50ML', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA' },
-            { id: 52, ref: 'TRIGENTAX X 20GR X 3 GTS', name: 'TRIGENTAX X 20GR X 3 GTS 2 ALCOHOL X 120ML', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA' },
-            { id: 53, ref: 'VAGINSOL F OVULOS', name: 'VAGINSOL F 100+200MG X 3 OVULOS', principle: 'CLINDAMICINA+CLOTRIMAZOL' },
-            { id: 54, ref: 'VAGINSOL F CR VAG X 20GR', name: 'VAGINSOL F CR VAG X 20GR+3 APLIC.', principle: 'CLINDAMICINA+CLOTRIMAZOL' },
-            { id: 55, ref: 'ZAKOR 100MG X 6 TBS', name: 'ZAKOR 100MG X 6 TBS', principle: 'MEBENDAZOL' },
-            { id: 56, ref: 'ZAKOR SUSP X 30ML', name: 'ZAKOR SUSP X 30ML', principle: 'MEBENDAZOL' },
+            { id: 1, ref: 'AIRMAX HFC 200DS (1+1)', name: 'AIRMAX AEROSOL HFC X 200DOSIS (1+1)', principle: 'SALBUTAMOL', price: 27609.12 },
+            { id: 2, ref: 'AIRMAX HFC 200DS', name: 'AIRMAX AEROSOL HFC X 200DOSIS', principle: 'SALBUTAMOL', price: 27607.58 },
+            { id: 3, ref: 'ASPROMIO AEROSOL 200DS', name: 'ASPROMIO AEROSOL X 200 DOSIS', principle: 'B.IPRATROPIO', price: 21982.73 },
+            { id: 4, ref: 'BIFIDOLAC 170MG X 6SOB', name: 'BIFIDOLAC 170MG X 6SOB', principle: 'LACTOBACILO', price: 65948.19 },
+            { id: 5, ref: 'BUSTEROL AEROSOL 200DS', name: 'BUSTEROL AEROSOL HFC X 200 DOSIS', principle: 'BUDESONIDA + FORMOTEROL', price: 157859.24 },
+            { id: 6, ref: 'CLOBEZAN CR X 25GR', name: 'CLOBEZAN CR X 25GR', principle: 'CLOBETASOL', price: 43482.67 },
+            { id: 7, ref: 'CLOBEZAN LOCION X 60ML', name: 'CLOBEZAN LOCION X 60ML', principle: 'CLOBETASOL', price: 67277.21 },
+            { id: 8, ref: 'CLOBEZAN UNG X 25GR', name: 'CLOBEZAN UNG X 25GR', principle: 'CLOBETASOL', price: 55802.67 },
+            { id: 9, ref: 'CUTAMYCON 500 X 1CBG', name: 'CUTAMYCON 500 X 1CBG', principle: 'CLOTRIMAZOL', price: 36416.46 },
+            { id: 10, ref: 'CUTAMYCON CR TOPICA X 20GR', name: 'CUTAMYCON CR TOPICA X 20GR', principle: 'CLOTRIMAZOL', price: 14131.66 },
+            { id: 11, ref: 'DESCONGEL F JBE X 60ML', name: 'DESCONGEL F JBE X 60ML', principle: 'FENILEFRINA + CETIRIZINA', price: 13914.33 },
+            { id: 12, ref: 'DESCONGEL GRIPA X 10CBG', name: 'DESCONGEL GRIPA X 10CBG', principle: 'FENILEFRINA + CETIRIZINA', price: 16632.00 },
+            { id: 13, ref: 'DESCONGEL LS X 100CAP', name: 'DESCONGEL LS X 100CAP', principle: 'FENILEFRINA + CETIRIZINA', price: 98093.17 },
+            { id: 14, ref: 'DESCONGELITO F GOTAS X 15ML', name: 'DESCONGELITO F GOTAS X 15ML', principle: 'FENILEFRINA + CETIRIZINA', price: 12110.56 },
+            { id: 15, ref: 'DESLORAN 5 MG X 10TBS', name: 'DESLORAN 5 MG X 10TBS', principle: 'DESLORATADINA', price: 79355.43 },
+            { id: 16, ref: 'DESLORAN JBE 0.05% X 60ML', name: 'DESLORAN JBE 0.05% X 60ML', principle: 'DESLORATADINA', price: 78389.08 },
+            { id: 17, ref: 'DOLFENAX 200MG X 10CAPS', name: 'DOLFENAX 200MG X 10CAPS', principle: 'A.TOLFENAMICO', price: 46985.40 },
+            { id: 18, ref: 'DUOPAS 400/20MG X 10TBS', name: 'DUOPAS 400/20MG X 10TBS', principle: 'IBUPROFENO+H.BUTILBROMURO', price: 44529.87 },
+            { id: 19, ref: 'ESTERMAX 0.625MG CR VAG X40GR', name: 'ESTERMAX 0.625MG CR VAG X40GR', principle: 'ESTROGENOS CONJUGADOS', price: 32569.46 },
+            { id: 20, ref: 'ESTERMAX 0.625MG X28TBS', name: 'ESTERMAX 0.625MG X28TBS', principle: 'ESTROGENOS CONJUGADOS', price: 32370.03 },
+            { id: 21, ref: 'FEMTRIOL CR VAG X 20GR', name: 'FEMTRIOL CR VAG X 20GR (5 APLICADOR)', principle: 'ESTRIOL', price: 26502.63 },
+            { id: 22, ref: 'FLUTURAN X 10CBG', name: 'FLUTURAN X 10CBG', principle: 'IBUPROFENO+DESLORATADINA', price: 35510.86 },
+            { id: 23, ref: 'FLUZETRIN F GOTAS PED X 15ML', name: 'FLUZETRIN F GOTAS PED X 15ML', principle: 'CETIRIZINA+FENILEFRINA', price: 24241.14 },
+            { id: 24, ref: 'FLUZETRIN F JBE X 60ML', name: 'FLUZETRIN F JBE X 60ML', principle: 'CETIRIZINA+FENILEFRINA', price: 31742.17 },
+            { id: 25, ref: 'FLUZETRIN F X 10CAP', name: 'FLUZETRIN F X 10CAP', principle: 'ACETAMINOFEN+CETIRIZINA', price: 29133.03 },
+            { id: 26, ref: 'FRIOTAN 65MG X 10CAPS', name: 'FRIOTAN 65MG X 10CAPS', principle: 'HEDERA HELIX', price: 34906.41 },
+            { id: 27, ref: 'FRIOTAN JBE X 120ML', name: 'FRIOTAN JBE X 120ML', principle: 'HEDERA HELIX', price: 28988.19 },
+            { id: 28, ref: 'FYNEXIN GEL 5% X 20GR', name: 'FYNEXIN GEL 5% X 20GR', principle: 'IBUPROFENO', price: 24730.86 },
+            { id: 29, ref: 'HYGIENEX ANTIPIOJOS X 24S/S', name: 'HYGIENEX ANTIPIOJOS X 24S/S', principle: 'CIPERMETRINA', price: 51695.49 },
+            { id: 30, ref: 'INFLABON 200MCG HFC AEROSOL', name: 'INFLABON 200MCG HFC AEROSOL', principle: 'BUDESONIDA', price: 126751.09 },
+            { id: 31, ref: 'INFLABON 50MCG HFC AEROSOL', name: 'INFLABON 50MCG HFC AEROSOL', principle: 'BUDESONIDA', price: 107618.74 },
+            { id: 32, ref: 'INFLACOR 4 MG AMP X 1ML', name: 'INFLACOR 4 MG AMP X 1ML', principle: 'BETAMETASONA', price: 18262.63 },
+            { id: 33, ref: 'INFLACOR 8 MG AMP X 2ML', name: 'INFLACOR 8 MG AMP X 2ML', principle: 'BETAMETASONA', price: 29074.29 },
+            { id: 34, ref: 'INFLACOR RET 3/3MG AMP X 1ML', name: 'INFLACOR RET 3/3MG AMP X 1ML', principle: 'BETAMETASONA', price: 33374.88 },
+            { id: 35, ref: 'INFLACOR RET 6/6MG AMP X 2ML', name: 'INFLACOR RET 6/6MG AMP X 2ML', principle: 'BETAMETASONA', price: 45514.40 },
+            { id: 36, ref: 'LACTULAX JBE X240ML', name: 'LACTULAX JBE X240ML', principle: 'LACTULOSA', price: 92704.69 },
+            { id: 37, ref: 'LACTULAX X 12S/S', name: 'LACTULAX X 12S/S', principle: 'LACTULOSA', price: 90443.43 },
+            { id: 38, ref: 'MULTIDOL 800MG X 30CBG', name: 'MULTIDOL 800MG X 30CBG', principle: 'IBUPROFENO', price: 74463.54 },
+            { id: 39, ref: 'MULTIDOL EXPRESS 400MG X 48CBG (2+1)', name: 'MULTIDOL EXPRESS 400MG X 48CBG (2+1)', principle: 'IBUPROFENO', price: 121743.93 },
+            { id: 40, ref: 'MULTIDOL EXPRESS 400MG X 48CBG', name: 'MULTIDOL EXPRESS 400MG X 48CBG', principle: 'IBUPROFENO', price: 54784.42 },
+            { id: 41, ref: 'NEUROPRON INY 2ML X 3AMP', name: 'NEUROPRON INY 2ML X 3AMP', principle: 'COMPLEJO B', price: 79746.56 },
+            { id: 42, ref: 'NEUROPRON INY X 2ML (UNIDAD)', name: 'NEUROPRON INY X 2ML (UNIDAD)', principle: 'COMPLEJO B', price: 21088.68 },
+            { id: 43, ref: 'PARAXIN 500MG X 6TBS', name: 'PARAXIN 500MG X 6TBS', principle: 'NITAZOXANIDA', price: 81167.24 },
+            { id: 44, ref: 'PARAXIN SUSP X 30ML', name: 'PARAXIN SUSP X 30ML', principle: 'NITAZOXANIDA', price: 55802.67 },
+            { id: 45, ref: 'SIMPAUSE 100MG X 30CBG', name: 'SIMPAUSE 100MG X 30CBG', principle: 'ISOFLAVONA', price: 98922.67 },
+            { id: 46, ref: 'TEREX CR VAG X 20GR', name: 'TEREX CR VAG X 20GR+3APLICADORES', principle: 'TERCONAZOL+DEXAMETASONA', price: 76698.16 },
+            { id: 47, ref: 'TIBONELLA 2.5MG X 28TBS', name: 'TIBONELLA 2.5MG X 28TBS', principle: 'TIBOLONA', price: 37563.68 },
+            { id: 48, ref: 'TRIGENTAX CR X 20GR', name: 'TRIGENTAX CR X 20GR', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA', price: 22032.21 },
+            { id: 49, ref: 'TRIGENTAX CR X 40GR', name: 'TRIGENTAX CR X 40GR', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA', price: 35728.18 },
+            { id: 50, ref: 'TRIGENTAX CR X 40GR X 2 GTS', name: 'TRIGENTAX CR X 40GR X 2 GTS ALCOHOL X 350ML', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA', price: 67468.04 },
+            { id: 51, ref: 'TRIGENTAX LOC TOP. X 50ML', name: 'TRIGENTAX LOC TOP. X 50ML', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA', price: 45547.00 },
+            { id: 52, ref: 'TRIGENTAX X 20GR X 3 GTS', name: 'TRIGENTAX X 20GR X 3 GTS 2 ALCOHOL X 120ML', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA', price: 66107.34 },
+            { id: 53, ref: 'VAGINSOL F OVULOS', name: 'VAGINSOL F 100+200MG X 3 OVULOS', principle: 'CLINDAMICINA+CLOTRIMAZOL', price: 97835.43 },
+            { id: 54, ref: 'VAGINSOL F CR VAG X 20GR', name: 'VAGINSOL F CR VAG X 20GR+3 APLIC.', principle: 'CLINDAMICINA+CLOTRIMAZOL', price: 92901.27 },
+            { id: 55, ref: 'ZAKOR 100MG X 6 TBS', name: 'ZAKOR 100MG X 6 TBS', principle: 'MEBENDAZOL', price: 6631.32 },
+            { id: 56, ref: 'ZAKOR SUSP X 30ML', name: 'ZAKOR SUSP X 30ML', principle: 'MEBENDAZOL', price: 10272.57 }
         ];
         let orders = [];
         let currentOrder = { clientName: '', supplier: '', items: [] };
@@ -287,6 +289,7 @@
         const cartItemCountEl = document.getElementById('cart-item-count');
         const currentOrderItemsEl = document.getElementById('currentOrderItems');
         const currentOrderInfoEl = document.getElementById('currentOrderInfo');
+        const cartTotalEl = document.getElementById('cart-total');
         const finalizeOrderBtn = document.getElementById('finalizeOrderBtn');
         const clearOrderBtn = document.getElementById('clearOrderBtn');
         const cancelEditBtn = document.getElementById('cancelEditBtn');
@@ -296,6 +299,22 @@
         const liveToast = new bootstrap.Toast(document.getElementById('liveToast'));
         const toastBody = document.getElementById('toast-body-content');
         const createOrderTab = new bootstrap.Tab(document.getElementById('nav-create-order-tab'));
+
+        const formatCurrency = (value) => {
+            return new Intl.NumberFormat('es-CO', {
+                style: 'currency',
+                currency: 'COP',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        };
+
+        const calculateOrderTotal = () => {
+            return currentOrder.items.reduce((total, item) => {
+                const product = products.find(p => p.id === item.productId);
+                return total + (product.price * item.quantity);
+            }, 0);
+        };
 
         const showToast = (message) => {
             toastBody.textContent = message;
@@ -318,7 +337,7 @@
                 item.innerHTML = `
                     <div>
                         <strong class="d-block">${product.ref}</strong>
-                        <small class="text-muted">${product.principle}</small>
+                        <small class="text-muted">${formatCurrency(product.price)}</small>
                     </div>
                     <div class="input-group input-group-sm" style="width: 120px;">
                         <input type="number" class="form-control quantity-to-add" placeholder="Cant." min="1" aria-label="Cantidad">
@@ -344,6 +363,7 @@
             
             if (currentOrder.items.length === 0) {
                 currentOrderItemsEl.innerHTML = '<p class="text-center text-muted mt-3">El carrito está vacío.</p>';
+                cartTotalEl.textContent = '';
                 updateUIState();
                 return;
             }
@@ -366,6 +386,7 @@
                 list.appendChild(listItem);
             });
             currentOrderItemsEl.appendChild(list);
+            cartTotalEl.textContent = `Total: ${formatCurrency(calculateOrderTotal())}`;
             updateUIState();
         };
 
@@ -417,8 +438,11 @@
                     orderItem.className = 'list-group-item';
                     orderItem.innerHTML = `
                         <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">Pedido del ${order.date ? order.date.toDate().toLocaleDateString('es-CO') : 'N/A'}</h6>
-                            <small>Depósito: <strong>${order.supplier}</strong></small>
+                            <div>
+                                <h6 class="mb-1">Pedido del ${order.date ? order.date.toDate().toLocaleDateString('es-CO') : 'N/A'}</h6>
+                                <small>Depósito: <strong>${order.supplier}</strong></small>
+                            </div>
+                            <strong class="text-primary fs-6">${formatCurrency(order.total || 0)}</strong>
                         </div>
                         <ul class="list-unstyled mt-2 mb-0">${itemsHtml}</ul>
                         <div class="mt-2 text-end">
@@ -467,15 +491,14 @@
             if (target.closest('.remove-item-btn')) {
                 const productId = parseInt(target.closest('.remove-item-btn').dataset.id);
                 currentOrder.items = currentOrder.items.filter(i => i.productId !== productId);
-                renderCurrentOrder();
             } else if (target.classList.contains('quantity-input')) {
                 const productId = parseInt(target.dataset.id);
                 const newQuantity = parseInt(target.value);
                 const item = currentOrder.items.find(i => i.productId === productId);
                 if (item && newQuantity > 0) { item.quantity = newQuantity; } 
                 else { currentOrder.items = currentOrder.items.filter(i => i.productId !== productId); }
-                renderCurrentOrder();
             }
+            renderCurrentOrder();
         };
 
         const resetCurrentOrder = () => {
@@ -487,13 +510,15 @@
         };
 
         finalizeOrderBtn.addEventListener('click', async () => {
+            const total = calculateOrderTotal();
             if (editingOrderId) {
                 const orderRef = doc(db, "orders", editingOrderId);
                 try {
                     await updateDoc(orderRef, {
                         clientName: currentOrder.clientName,
                         supplier: currentOrder.supplier,
-                        items: currentOrder.items
+                        items: currentOrder.items,
+                        total: total
                     });
                     alert(`Pedido actualizado con éxito para ${currentOrder.clientName}.`);
                     cartModal.hide();
@@ -503,41 +528,16 @@
                     alert("Hubo un error al actualizar el pedido.");
                 }
             } else {
-                const today = new Date();
-                const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
-                const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
                 const ordersRef = collection(db, 'orders');
-                const q = query(ordersRef, 
-                    where("clientName", "==", currentOrder.clientName),
-                    where("supplier", "==", currentOrder.supplier),
-                    where("date", ">=", startOfDay),
-                    where("date", "<=", endOfDay)
-                );
-                
                 try {
-                    const querySnapshot = await getDocs(q);
-                    
-                    if (querySnapshot.empty) {
-                        const newOrder = { ...currentOrder, date: serverTimestamp() };
-                        await addDoc(ordersRef, newOrder);
-                        alert(`Nuevo pedido para ${currentOrder.clientName} guardado.`);
-                    } else {
-                        const existingOrderDoc = querySnapshot.docs[0];
-                        const existingItems = existingOrderDoc.data().items;
-                        currentOrder.items.forEach(newItem => {
-                            const existingItem = existingItems.find(item => item.productId === newItem.productId);
-                            if (existingItem) { existingItem.quantity += newItem.quantity; } 
-                            else { existingItems.push(newItem); }
-                        });
-                        const orderRef = doc(db, "orders", existingOrderDoc.id);
-                        await updateDoc(orderRef, { items: existingItems });
-                        alert(`Pedido para ${currentOrder.clientName} actualizado.`);
-                    }
+                    const newOrder = { ...currentOrder, total: total, date: serverTimestamp() };
+                    await addDoc(ordersRef, newOrder);
+                    alert(`Nuevo pedido para ${currentOrder.clientName} guardado.`);
                     cartModal.hide();
                     resetCurrentOrder();
                 } catch (error) {
                     console.error("Error al guardar: ", error);
-                    alert("Hubo un error. Revisa la consola.");
+                    alert("Hubo un error al guardar el pedido.");
                 }
             }
         });
