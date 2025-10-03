@@ -1426,16 +1426,29 @@
         
         document.getElementById('exportBtn').addEventListener('click', exportToExcel);
         
-        const ordersQuery = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-        onSnapshot(ordersQuery, (snapshot) => {
-            orders = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            
-            renderAllOrders();
-            updateStats();
-        });
+// Cargar pedidos SIN orderBy para evitar problemas de índice
+onSnapshot(collection(db, 'orders'), (snapshot) => {
+    console.log('📦 Pedidos recibidos de Firebase:', snapshot.size);
+    
+    orders = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+    }));
+    
+    // Ordenar manualmente por fecha (más reciente primero)
+    orders.sort((a, b) => {
+        if (!a.createdAt) return 1;
+        if (!b.createdAt) return -1;
+        return b.createdAt.seconds - a.createdAt.seconds;
+    });
+    
+    console.log('✅ Total de pedidos cargados:', orders.length);
+    renderAllOrders();
+    updateStats();
+}, (error) => {
+    console.error('❌ Error al cargar pedidos:', error);
+    showToast('Error al cargar pedidos: ' + error.message, 'warning');
+});
         
         renderProducts('', 'all');
         renderCurrentOrder();
