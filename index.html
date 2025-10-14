@@ -779,6 +779,30 @@
             border-top-color: white;
             animation: spin 0.8s ease-in-out infinite;
         }
+        
+        .connection-status {
+            position: fixed;
+            top: calc(80px + var(--safe-area-top));
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: none;
+            z-index: 1025;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .connection-status.show {
+            display: block;
+        }
+        
+        .connection-status.error {
+            background: var(--danger-color);
+        }
     </style>
 </head>
 <body>
@@ -798,6 +822,11 @@
     <div class="offline-indicator" id="offlineIndicator">
         <i class="fa-solid fa-wifi-slash me-2"></i>
         Sin conexión
+    </div>
+    
+    <div class="connection-status" id="connectionStatus">
+        <i class="fa-solid fa-check-circle me-2"></i>
+        Conectado a Firebase
     </div>
     
     <div class="pull-to-refresh" id="pullToRefresh">
@@ -1012,18 +1041,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <script type="module">
+        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
         
+        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBMjHvxS-GmiSbJiQKAWUrwnG8oJKphLh8",
             authDomain: "gestor-pedidos-movil.firebaseapp.com",
             projectId: "gestor-pedidos-movil",
-            storageBucket: "gestor-pedidos-movil.appspot.com",
+            storageBucket: "gestor-pedidos-movil.firebasestorage.app",
             messagingSenderId: "628865028041",
             appId: "1:628865028041:web:73d3e824aff6778fe36218"
         };
         
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
@@ -1097,6 +1129,7 @@
         let touchStartY = 0;
         let touchEndY = 0;
         let isPulling = false;
+        let firebaseConnected = false;
         
         // DOM elements
         const productListEl = document.getElementById('productList');
@@ -1121,6 +1154,7 @@
         const themeIcon = document.getElementById('themeIcon');
         const offlineIndicator = document.getElementById('offlineIndicator');
         const pullToRefresh = document.getElementById('pullToRefresh');
+        const connectionStatus = document.getElementById('connectionStatus');
         
         // Bootstrap components
         const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
@@ -1138,6 +1172,104 @@
             renderCurrentOrder();
             updateUIState();
             checkConnectionStatus();
+            initFirebaseConnection();
+        }
+        
+        // Initialize Firebase connection with better error handling
+        async function initFirebaseConnection() {
+            try {
+                // Test connection by trying to read a simple document
+                const testQuery = query(collection(db, "orders"));
+                const querySnapshot = await getDocs(testQuery);
+                
+                firebaseConnected = true;
+                showConnectionStatus(true);
+                loadOrders();
+                console.log("✅ Conexión a Firebase establecida correctamente");
+            } catch (error) {
+                console.error("❌ Error al conectar con Firebase:", error);
+                firebaseConnected = false;
+                showConnectionStatus(false);
+                
+                // Try to load from cache
+                loadCachedOrders();
+                
+                // Retry connection after 5 seconds
+                setTimeout(initFirebaseConnection, 5000);
+            }
+        }
+        
+        // Show connection status
+        function showConnectionStatus(success) {
+            connectionStatus.className = success ? 
+                'connection-status show' : 
+                'connection-status error show';
+            
+            connectionStatus.innerHTML = success ? 
+                '<i class="fa-solid fa-check-circle me-2"></i>Conectado a Firebase' : 
+                '<i class="fa-solid fa-exclamation-triangle me-2"></i>Error de conexión';
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                connectionStatus.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Load orders with better error handling
+        function loadOrders() {
+            if (!firebaseConnected) {
+                loadCachedOrders();
+                return;
+            }
+            
+            try {
+                // Use a simple query without orderBy to avoid index issues
+                const q = collection(db, "orders");
+                
+                onSnapshot(q, (snapshot) => {
+                    console.log(`📦 Pedidos recibidos de Firebase: ${snapshot.size}`);
+                    
+                    orders = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                    
+                    // Sort manually by date (newest first)
+                    orders.sort((a, b) => {
+                        if (!a.createdAt) return 1;
+                        if (!b.createdAt) return -1;
+                        return b.createdAt.seconds - a.createdAt.seconds;
+                    });
+                    
+                    // Cache orders for offline use
+                    localStorage.setItem('cachedOrders', JSON.stringify(orders));
+                    
+                    renderAllOrders();
+                    updateStats();
+                }, (error) => {
+                    console.error('❌ Error al cargar pedidos:', error);
+                    showToast('Error al cargar pedidos: ' + error.message, 'warning');
+                    loadCachedOrders();
+                });
+            } catch (error) {
+                console.error('❌ Error al configurar listener de pedidos:', error);
+                loadCachedOrders();
+            }
+        }
+        
+        // Load cached orders when offline
+        function loadCachedOrders() {
+            const cachedOrders = localStorage.getItem('cachedOrders');
+            if (cachedOrders) {
+                try {
+                    orders = JSON.parse(cachedOrders);
+                    renderAllOrders();
+                    updateStats();
+                    console.log("📱 Pedidos cargados desde caché local");
+                } catch (error) {
+                    console.error('Error al cargar pedidos desde caché:', error);
+                }
+            }
         }
         
         // Setup event listeners
@@ -1271,8 +1403,10 @@
                 if (isOnline) {
                     offlineIndicator.classList.remove('show');
                     showToast('Conexión restablecida', 'success');
-                    // Sync with Firebase when back online
-                    syncWithFirebase();
+                    // Try to reconnect to Firebase
+                    if (!firebaseConnected) {
+                        initFirebaseConnection();
+                    }
                 } else {
                     offlineIndicator.classList.add('show');
                     showToast('Sin conexión. Trabajando en modo offline', 'warning');
@@ -1324,71 +1458,18 @@
             
             // Reload products and orders
             renderProducts(productSearchEl.value, currentFilter);
-            loadOrders();
+            
+            if (firebaseConnected) {
+                loadOrders();
+            } else {
+                initFirebaseConnection();
+            }
             
             setTimeout(() => {
                 pullToRefresh.style.transform = 'translateY(-60px)';
                 pullToRefresh.classList.remove('show');
                 showToast('Datos actualizados', 'success');
             }, 1500);
-        }
-        
-        // Firebase synchronization
-        function syncWithFirebase() {
-            if (!isOnline) return;
-            
-            // Show loading state
-            productListEl.innerHTML = `
-                <div class="text-center p-4">
-                    <div class="loading"></div>
-                    <p class="mt-2 text-muted">Sincronizando con el servidor...</p>
-                </div>
-            `;
-            
-            // Load orders from Firebase
-            loadOrders();
-            
-            // Show success message
-            setTimeout(() => {
-                showToast('Datos sincronizados correctamente', 'success');
-            }, 1000);
-        }
-        
-        function loadOrders() {
-            if (!isOnline) {
-                // Load from cache if offline
-                const cachedOrders = localStorage.getItem('cachedOrders');
-                if (cachedOrders) {
-                    orders = JSON.parse(cachedOrders);
-                    renderAllOrders();
-                    updateStats();
-                }
-                return;
-            }
-            
-            // Load from Firebase
-            onSnapshot(collection(db, 'orders'), (snapshot) => {
-                orders = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                
-                // Sort by date (newest first)
-                orders.sort((a, b) => {
-                    if (!a.createdAt) return 1;
-                    if (!b.createdAt) return -1;
-                    return b.createdAt.seconds - a.createdAt.seconds;
-                });
-                
-                // Cache orders for offline use
-                localStorage.setItem('cachedOrders', JSON.stringify(orders));
-                
-                renderAllOrders();
-                updateStats();
-            }, (error) => {
-                console.error('Error loading orders:', error);
-                showToast('Error al cargar pedidos: ' + error.message, 'warning');
-            });
         }
         
         // Product rendering
@@ -1682,7 +1763,54 @@
             } catch (error) {
                 console.error('Error al guardar el pedido:', error);
                 showToast('Error al guardar el pedido. Intenta nuevamente.', 'warning');
+                
+                // Save locally for later sync
+                savePendingOrder(orderData);
             }
+        }
+        
+        // Save pending orders for later sync
+        function savePendingOrder(orderData) {
+            const pendingOrders = JSON.parse(localStorage.getItem('pendingOrders') || '[]');
+            pendingOrders.push(orderData);
+            localStorage.setItem('pendingOrders', JSON.stringify(pendingOrders));
+            showToast('Pedido guardado localmente. Se sincronizará cuando haya conexión.', 'info');
+        }
+        
+        // Sync pending orders when back online
+        function syncPendingOrders() {
+            const pendingOrders = JSON.parse(localStorage.getItem('pendingOrders') || '[]');
+            
+            if (pendingOrders.length === 0) return;
+            
+            showToast(`Sincronizando ${pendingOrders.length} pedido(s) pendiente(s)...`, 'info');
+            
+            const syncPromises = pendingOrders.map(async (order) => {
+                try {
+                    await addDoc(collection(db, 'orders'), order);
+                    return true;
+                } catch (error) {
+                    console.error('Error syncing order:', error);
+                    return false;
+                }
+            });
+            
+            Promise.all(syncPromises).then((results) => {
+                const successCount = results.filter(r => r).length;
+                const failCount = results.length - successCount;
+                
+                if (successCount > 0) {
+                    showToast(`${successCount} pedido(s) sincronizado(s) correctamente`, 'success');
+                }
+                
+                if (failCount > 0) {
+                    showToast(`${failCount} pedido(s) no se pudieron sincronizar`, 'warning');
+                }
+                
+                // Clear synced orders
+                const newPendingOrders = pendingOrders.filter((_, i) => !results[i]);
+                localStorage.setItem('pendingOrders', JSON.stringify(newPendingOrders));
+            });
         }
         
         function handleOrderHistoryClick(e) {
