@@ -2,244 +2,744 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM Pedidos Farmacéutico Pro — Corregido</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CRM Pedidos Farmacéutico Pro</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
+    
     <style>
-        :root{
+        :root {
             --primary-color: #2563eb;
             --primary-dark: #1d4ed8;
+            --secondary-color: #059669;
+            --accent-color: #f59e0b;
             --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --card-shadow: 0 4px 20px rgba(0,0,0,0.08);
             --card-shadow-hover: 0 8px 30px rgba(0,0,0,0.12);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-light: #f8fafc;
             --border-color: #e5e7eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
         }
-        *{ font-family: 'Inter', sans-serif; -webkit-tap-highlight-color:transparent; }
-        body{ background: #f8fafc; color: #1f2937; padding-bottom:100px; }
-        .main-header{
+        
+        * {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: var(--bg-light);
+            color: var(--text-primary);
+            padding-bottom: 90px;
+            overflow-x: hidden;
+        }
+        
+        .main-header {
             background: var(--bg-gradient);
-            color:#fff;
-            padding:1rem 1rem;
+            color: white;
+            padding: 1.5rem 1rem;
             box-shadow: var(--card-shadow);
-            position: sticky; top:0; z-index:1100;
-            backdrop-filter: blur(6px);
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            backdrop-filter: blur(10px);
         }
-        .main-header .header-actions { display:flex; gap:.5rem; align-items:center; }
-        .card{ border:none; border-radius:12px; box-shadow: var(--card-shadow); }
-        .card-header{ background: linear-gradient(135deg,#f8fafc 0%, #e2e8f0 100%); border-bottom:1px solid var(--border-color); font-weight:600; }
-        .list-group-item{ border:none; border-radius:10px; margin-bottom:.6rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .filter-chip{ cursor:pointer; display:inline-flex; align-items:center; gap:.5rem; padding:.5rem 1rem; border-radius:20px; background:rgba(37,99,235,0.08); color:var(--primary-color); font-weight:600; margin:.25rem; }
-        .filter-chip.active{ background:var(--primary-color); color:white; transform:scale(1.03); }
-        .empty-state{ text-align:center; padding:2.5rem 1rem; color:#6b7280; }
-        .fab-cart{ position: fixed; bottom: 100px; right: 20px; width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,var(--primary-color),var(--primary-dark)); color:white; display:flex; align-items:center; justify-content:center; z-index:1200; box-shadow:0 8px 24px rgba(37,99,235,0.25); }
-        .stat-card{ padding:1.25rem; border-radius:12px; text-align:center; }
-        .stat-value{ font-weight:800; font-size:1.6rem; color:var(--primary-color); display:block; }
-        .toast { border-radius:12px; }
-        .modal-content{ border-radius:12px; }
-        @media (max-width:768px){ .stats-container{ grid-template-columns: repeat(2,1fr); } }
+        
+        .main-header h5 {
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            border: none;
+            box-shadow: var(--card-shadow);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+        }
+        
+        .card:hover {
+            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-2px);
+        }
+        
+        .card:active {
+            transform: translateY(0);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 16px 16px 0 0 !important;
+            padding: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.875rem 1rem;
+            font-size: 16px;
+            min-height: 52px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            transform: translateY(-1px);
+            outline: none;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            min-height: 48px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: white;
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .product-list-container {
+            max-height: calc(100vh - 450px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) transparent;
+        }
+        
+        .product-list-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .product-list-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        .product-list-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+        
+        .list-group-item {
+            border: none;
+            padding: 1.25rem;
+            margin-bottom: 0.75rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .list-group-item:hover {
+            background: #f8fafc;
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .list-group-item:active {
+            transform: translateX(2px);
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            z-index: 1030;
+            padding: 0.75rem 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .bottom-nav .nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            padding: 0.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            margin: 0 0.25rem;
+            font-weight: 600;
+            min-height: 56px;
+        }
+        
+        .bottom-nav .nav-link.active {
+            color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.1);
+        }
+        
+        .bottom-nav .nav-link i {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+        
+        .fab-cart {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+            z-index: 1040;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .fab-cart:hover {
+            transform: scale(1.1) translateY(-2px);
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+        }
+        
+        .fab-cart:active {
+            transform: scale(1.05) translateY(0);
+        }
+        
+        .fab-cart .badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--danger-color);
+            animation: bounce 0.5s ease-in-out;
+            min-width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-hover);
+        }
+        
+        .stat-card:active {
+            transform: translateY(-2px);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .filters-container {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1rem;
+        }
+        
+        .filter-chip {
+            display: inline-block;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+            padding: 0.625rem 1.25rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .filter-chip.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-dark);
+            transform: scale(1.05);
+        }
+        
+        .filter-chip:active {
+            transform: scale(0.98);
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
+            40%, 43% { transform: translate3d(0, -8px, 0); }
+            70% { transform: translate3d(0, -4px, 0); }
+            90% { transform: translate3d(0, -2px, 0); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .toast {
+            border-radius: 12px;
+            box-shadow: var(--card-shadow-hover);
+            border: none;
+        }
+        
+        .toast-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: none;
+            border-radius: 12px;
+            color: #92400e;
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .accordion-button {
+            background: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            padding: 1.25rem;
+            min-height: 56px;
+        }
+        
+        .accordion-button:not(.collapsed) {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+            color: var(--primary-color);
+        }
+        
+        .accordion-item {
+            border: none;
+            margin-bottom: 0.5rem;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .search-container {
+            position: relative;
+        }
+        
+        .search-container .fa-search {
+            color: var(--primary-color);
+        }
+        
+        .input-group-text {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-right: none;
+            border-radius: 12px 0 0 12px;
+            min-height: 52px;
+        }
+        
+        #productSearch {
+            border-left: none;
+            border-radius: 0 12px 12px 0;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(37, 99, 235, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 0.8s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .export-btn {
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            transition: all 0.3s ease;
+            min-height: 48px;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .export-btn:active {
+            transform: translateY(0);
+        }
+        
+        .quantity-input {
+            max-width: 90px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .product-ref {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+        
+        mark {
+            background: linear-gradient(135deg, rgba(255, 235, 59, 0.4), rgba(255, 193, 7, 0.4));
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding: 0 1rem;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .stat-card {
+                padding: 1.25rem 1rem;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            
+            .main-header h5 {
+                font-size: 1.2rem;
+            }
+            
+            .filter-chip {
+                font-size: 0.8rem;
+                padding: 0.5rem 1rem;
+            }
+            
+            .product-list-container {
+                max-height: calc(100vh - 500px);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .stat-card {
+                padding: 1rem 0.75rem;
+            }
+            
+            .stat-value {
+                font-size: 1.3rem;
+            }
+            
+            .stat-label {
+                font-size: 0.75rem;
+            }
+            
+            .main-header {
+                padding: 1.25rem 1rem;
+            }
+            
+            .btn {
+                padding: 0.625rem 1.25rem;
+            }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            opacity: 0.3;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
-    <!-- HEADER -->
-    <header class="main-header">
-        <div class="container d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-3">
-                <i class="fa-solid fa-prescription-bottle" style="font-size:1.6rem; opacity:.95"></i>
-                <div>
-                    <h5 class="mb-0 fw-bold">CRM Pedidos Farmacéutico Pro</h5>
-                    <small>Gestión de pedidos y control de stock</small>
-                </div>
-            </div>
-
-            <div class="header-actions">
-                <button class="btn btn-light btn-sm me-1" id="openHistoryBtn" title="Abrir historial">
-                    <i class="fa-solid fa-history me-1"></i> Historial
-                </button>
-                <button class="btn btn-outline-light btn-sm d-none d-md-inline" id="refreshBtnHeader" title="Actualizar datos">
-                    <i class="fa-solid fa-rotate"></i>
-                </button>
-            </div>
+    <header class="main-header text-center">
+        <div class="d-flex align-items-center justify-content-center">
+            <i class="fa-solid fa-prescription-bottle text-white me-3" style="font-size: 1.8rem;"></i>
+            <h5 class="mb-0">CRM Pedidos Farmacéutico Pro</h5>
         </div>
+        <small class="opacity-75">Sistema de Gestión de Pedidos Profesional</small>
     </header>
-
-    <!-- MAIN -->
+    
     <main class="container-fluid mt-3">
-        <div class="stats-container" id="statsContainer" style="display:none; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap:1rem;">
-            <div class="stat-card card">
-                <div class="card-body">
-                    <span class="stat-value" id="totalOrders">0</span>
-                    <span class="text-muted small"><i class="fa-solid fa-file-invoice me-1"></i>Total Pedidos</span>
-                </div>
+        <div class="stats-container fade-in" id="statsContainer" style="display: none;">
+            <div class="stat-card">
+                <span class="stat-value" id="totalOrders">0</span>
+                <span class="stat-label">
+                    <i class="fa-solid fa-file-invoice me-1"></i>
+                    Total Pedidos
+                </span>
             </div>
-            <div class="stat-card card">
-                <div class="card-body">
-                    <span class="stat-value" id="totalValue">$0</span>
-                    <span class="text-muted small"><i class="fa-solid fa-dollar-sign me-1"></i>Valor Total</span>
-                </div>
+            <div class="stat-card">
+                <span class="stat-value" id="totalValue">\$0</span>
+                <span class="stat-label">
+                    <i class="fa-solid fa-dollar-sign me-1"></i>
+                    Valor Total
+                </span>
             </div>
-            <div class="stat-card card">
-                <div class="card-body">
-                    <span class="stat-value" id="totalClients">0</span>
-                    <span class="text-muted small"><i class="fa-solid fa-users me-1"></i>Clientes</span>
-                </div>
+            <div class="stat-card">
+                <span class="stat-value" id="totalClients">0</span>
+                <span class="stat-label">
+                    <i class="fa-solid fa-users me-1"></i>
+                    Clientes
+                </span>
             </div>
-            <div class="stat-card card">
-                <div class="card-body">
-                    <span class="stat-value" id="avgOrderValue">$0</span>
-                    <span class="text-muted small"><i class="fa-solid fa-chart-line me-1"></i>Promedio</span>
-                </div>
+            <div class="stat-card">
+                <span class="stat-value" id="avgOrderValue">\$0</span>
+                <span class="stat-label">
+                    <i class="fa-solid fa-chart-line me-1"></i>
+                    Promedio
+                </span>
             </div>
         </div>
-
+        
         <div class="tab-content" id="myTabContent">
-            <!-- CREATE ORDER -->
             <div class="tab-pane fade show active" id="create-order-tab" role="tabpanel">
-                <div class="card mb-3">
+                <div class="card mb-3 fade-in">
                     <div class="card-body">
                         <div id="editing-banner" class="alert alert-warning d-none" role="alert">
                             <i class="fa-solid fa-pencil me-2"></i>
                             <strong>Modo Edición:</strong> Estás modificando un pedido existente.
                         </div>
-
+                        
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label"><i class="fa-solid fa-building me-2 text-primary"></i> Nombre del Cliente</label>
-                                <input type="text" class="form-control" id="clientNameInput" placeholder="Ej: Droguería La Principal" required>
+                                <label for="clientNameInput" class="form-label">
+                                    <i class="fa-solid fa-building me-2 text-primary"></i>
+                                    Nombre del Cliente
+                                </label>
+                                <input type="text" class="form-control" id="clientNameInput" 
+                                       placeholder="Ej: Droguería La Principal" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label"><i class="fa-solid fa-warehouse me-2 text-primary"></i> Depósito</label>
+                                <label for="supplierSelect" class="form-label">
+                                    <i class="fa-solid fa-warehouse me-2 text-primary"></i>
+                                    Depósito
+                                </label>
                                 <select class="form-select" id="supplierSelect" required>
                                     <option value="" selected disabled>-- Seleccione un depósito --</option>
-                                    <option value="DROSAN">DROSAN</option>
-                                    <option value="UNIDROGAS">UNIDROGAS</option>
+                                    <option value="DROSAN">🏥 DROSAN</option>
+                                    <option value="UNIDROGAS">🏥 UNIDROGAS</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="filters-container mb-3">
-                    <h6 class="mb-2"><i class="fa-solid fa-filter me-2 text-primary"></i> Filtros Rápidos</h6>
-                    <div id="filterChips" class="mb-2">
-                        <span class="filter-chip active" data-filter="all"><i class="fa-solid fa-list me-1"></i> Todos</span>
-                        <span class="filter-chip" data-filter="respiratory"><i class="fa-solid fa-lungs me-1"></i> Respiratorio</span>
-                        <span class="filter-chip" data-filter="topical"><i class="fa-solid fa-hand-holding-medical me-1"></i> Tópicos</span>
-                        <span class="filter-chip" data-filter="gastrointestinal"><i class="fa-solid fa-stomach me-1"></i> Digestivo</span>
-                        <span class="filter-chip" data-filter="gynecological"><i class="fa-solid fa-venus me-1"></i> Ginecológico</span>
+                
+                <div class="filters-container fade-in">
+                    <h6 class="mb-3">
+                        <i class="fa-solid fa-filter me-2 text-primary"></i>
+                        Filtros Rápidos
+                    </h6>
+                    <div id="filterChips">
+                        <span class="filter-chip active" data-filter="all">
+                            <i class="fa-solid fa-list me-1"></i>Todos
+                        </span>
+                        <span class="filter-chip" data-filter="respiratory">
+                            <i class="fa-solid fa-lungs me-1"></i>Respiratorio
+                        </span>
+                        <span class="filter-chip" data-filter="topical">
+                            <i class="fa-solid fa-hand-holding-medical me-1"></i>Tópicos
+                        </span>
+                        <span class="filter-chip" data-filter="gastrointestinal">
+                            <i class="fa-solid fa-stomach me-1"></i>Digestivo
+                        </span>
+                        <span class="filter-chip" data-filter="gynecological">
+                            <i class="fa-solid fa-venus me-1"></i>Ginecológico
+                        </span>
                     </div>
                 </div>
-
-                <div class="card mb-4">
+                
+                <div class="card fade-in">
                     <div class="card-header">
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fa-solid fa-search"></i></span>
-                            <input type="text" id="productSearch" class="form-control" placeholder="Buscar por nombre, referencia o principio activo...">
+                        <div class="search-container">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fa-solid fa-search"></i>
+                                </span>
+                                <input type="text" id="productSearch" class="form-control" 
+                                       placeholder="Buscar por nombre, referencia o principio activo...">
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body p-0 product-list-container" style="max-height:520px; overflow:auto;">
+                    <div class="card-body p-0 product-list-container">
                         <div class="list-group list-group-flush" id="productList">
                             <div class="text-center p-4">
-                                <div class="spinner-border text-primary" role="status" style="width:36px;height:36px"></div>
+                                <div class="loading"></div>
                                 <p class="mt-2 text-muted">Cargando productos...</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- HISTORY TAB -->
+            
             <div class="tab-pane fade" id="history-tab" role="tabpanel">
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <h6 class="mb-0"><i class="fa-solid fa-list-alt me-2 text-primary"></i> Historial de Pedidos</h6>
-                    <button class="btn btn-success" id="exportBtn"><i class="fa-solid fa-download me-2"></i>Exportar Excel</button>
+                    <h6 class="mb-0">
+                        <i class="fa-solid fa-history me-2 text-primary"></i>
+                        Historial de Pedidos
+                    </h6>
+                    <button class="export-btn" id="exportBtn">
+                        <i class="fa-solid fa-download me-2"></i>
+                        Exportar Excel
+                    </button>
                 </div>
-
-                <div class="card">
-                    <div class="card-header"><i class="fa-solid fa-file-invoice me-2"></i> Pedidos por Cliente</div>
-                    <div class="card-body">
-                        <div id="orderHistoryContainer" class="order-history-target">
-                            <div class="text-center p-4">
-                                <div class="spinner-border text-primary" role="status" style="width:36px;height:36px"></div>
-                                <p class="mt-2 text-muted">Cargando historial...</p>
-                            </div>
+                
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <i class="fa-solid fa-file-invoice me-2"></i>
+                        Pedidos por Cliente
+                    </div>
+                    <div class="accordion" id="orderHistoryContainer">
+                        <div class="text-center p-4">
+                            <div class="loading"></div>
+                            <p class="mt-2 text-muted">Cargando historial...</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-
-    <!-- BOTTOM NAV -->
-    <nav class="bottom-nav fixed-bottom bg-white border-top py-2" style="z-index:1090;">
-        <div class="container d-flex justify-content-around">
-            <a class="text-center text-muted" id="nav-create-order-tab" data-bs-toggle="tab" href="#create-order-tab" role="tab">
-                <i class="fa-solid fa-plus-circle d-block"></i> Crear Pedido
+    
+    <nav class="bottom-nav">
+        <div class="nav nav-pills nav-fill" id="nav-tab" role="tablist">
+            <a class="nav-link active" id="nav-create-order-tab" data-bs-toggle="tab" href="#create-order-tab" role="tab">
+                <i class="fa-solid fa-plus-circle"></i>
+                Crear Pedido
             </a>
-            <a class="text-center text-muted" id="nav-history-tab" data-bs-toggle="tab" href="#history-tab" role="tab">
-                <i class="fa-solid fa-list-alt d-block"></i> Historial
+            <a class="nav-link" id="nav-history-tab" data-bs-toggle="tab" href="#history-tab" role="tab">
+                <i class="fa-solid fa-list-alt"></i>
+                Historial
             </a>
         </div>
     </nav>
-
-    <!-- FAB (Cart) -->
-    <button class="fab-cart" data-bs-toggle="modal" data-bs-target="#cartModal" title="Abrir carrito">
+    
+    <button class="fab-cart" data-bs-toggle="modal" data-bs-target="#cartModal">
         <i class="fa-solid fa-cart-shopping"></i>
-        <span class="badge bg-danger rounded-pill" id="cart-item-count" style="position:absolute;top:-6px;right:-6px;">0</span>
+        <span class="badge bg-danger rounded-pill" id="cart-item-count">0</span>
     </button>
-
-    <!-- CART MODAL -->
-    <div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
+    
+    <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-lg">
-            <div class="modal-content">
-                <div class="modal-header" style="background:var(--bg-gradient); color:white; border:none;">
-                    <h5 class="modal-title"><i class="fa-solid fa-shopping-cart me-2"></i> Resumen del Pedido</h5>
-                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <div class="modal-content" style="border-radius: 16px; border: none;">
+                <div class="modal-header" style="background: var(--bg-gradient); color: white; border-radius: 16px 16px 0 0;">
+                    <h5 class="modal-title" id="cartModalLabel">
+                        <i class="fa-solid fa-shopping-cart me-2"></i>
+                        Resumen del Pedido
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="currentOrderInfo" class="alert alert-info small border-0" style="background: linear-gradient(135deg,#dbeafe 0%,#bfdbfe 100%); color:#1e40af;"></div>
+                    <div id="currentOrderInfo" class="alert alert-info small border-0" 
+                         style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af;"></div>
                     <div id="currentOrderItems"></div>
-                    <hr>
+                    <hr style="border-color: var(--border-color);">
                     <div id="cart-total" class="fs-5 fw-bold text-end text-primary"></div>
                 </div>
-                <div class="modal-footer justify-content-between">
+                <div class="modal-footer justify-content-between" style="border-top: 1px solid var(--border-color);">
                     <div>
-                        <button class="btn btn-outline-danger" id="clearOrderBtn"><i class="fa-solid fa-trash me-1"></i> Limpiar</button>
-                        <button class="btn btn-outline-secondary d-none" id="cancelEditBtn"><i class="fa-solid fa-times me-1"></i> Cancelar Edición</button>
+                        <button class="btn btn-outline-danger" id="clearOrderBtn">
+                            <i class="fa-solid fa-trash me-1"></i> Limpiar
+                        </button>
+                        <button class="btn btn-outline-secondary d-none" id="cancelEditBtn">
+                            <i class="fa-solid fa-times me-1"></i> Cancelar Edición
+                        </button>
                     </div>
-                    <button class="btn btn-primary" id="finalizeOrderBtn" disabled><i class="fa-solid fa-check-circle me-1"></i> Finalizar Pedido</button>
+                    <button class="btn btn-primary" id="finalizeOrderBtn" disabled>
+                        <i class="fa-solid fa-check-circle me-1"></i>
+                        Finalizar Pedido
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- ORDER HISTORY MODAL (botón header) -->
-    <div class="modal fade" id="orderHistoryModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header" style="background:var(--bg-gradient); color:white; border:none;">
-                    <h5 class="modal-title"><i class="fa-solid fa-history me-2"></i> Historial de Pedidos</h5>
-                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="order-history-target" id="orderHistoryModalContainer">
-                        <div class="text-center p-4">
-                            <div class="spinner-border text-primary" role="status" style="width:36px;height:36px"></div>
-                            <p class="mt-2 text-muted">Cargando historial...</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast -->
+    
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
@@ -250,17 +750,14 @@
             <div class="toast-body" id="toast-body-content"></div>
         </div>
     </div>
-
-    <!-- LIBS -->
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-    <!-- APP (mantengo imports modular firebase v9 como venías) -->
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-
-        // === CONFIG FIREBASE (mantener tus credenciales) ===
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+        
         const firebaseConfig = {
             apiKey: "AIzaSyBMjHvxS-GmiSbJiQKAWUrwnG8oJKphLh8",
             authDomain: "gestor-pedidos-movil.firebaseapp.com",
@@ -269,25 +766,75 @@
             messagingSenderId: "628865028041",
             appId: "1:628865028041:web:73d3e824aff6778fe36218"
         };
+        
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
-        // === DATOS Y ESTADO ===
-        const products = [ /* ... same products array as before ... */ 
-            /* Para ahorrar espacio en este bloque de ejemplo, asegúrate de pegar exactamente
-               la lista completa de productos desde tu archivo original entre estos corchetes. */
+        
+        const products = [
+            { id: 1, ref: 'AIRMAX HFC 200DS (1+1)', name: 'AIRMAX AEROSOL HFC X 200DOSIS (1+1)', principle: 'SALBUTAMOL', price: 27609.12, category: 'respiratory' },
+            { id: 2, ref: 'AIRMAX HFC 200DS', name: 'AIRMAX AEROSOL HFC X 200DOSIS', principle: 'SALBUTAMOL', price: 27607.58, category: 'respiratory' },
+            { id: 3, ref: 'ASPROMIO AEROSOL 200DS', name: 'ASPROMIO AEROSOL X 200 DOSIS', principle: 'B.IPRATROPIO', price: 21982.73, category: 'respiratory' },
+            { id: 4, ref: 'BIFIDOLAC 170MG X 6SOB', name: 'BIFIDOLAC 170MG X 6SOB', principle: 'LACTOBACILO', price: 65948.19, category: 'gastrointestinal' },
+            { id: 5, ref: 'BUSTEROL AEROSOL 200DS', name: 'BUSTEROL AEROSOL HFC X 200 DOSIS', principle: 'BUDESONIDA + FORMOTEROL', price: 157859.24, category: 'respiratory' },
+            { id: 6, ref: 'CLOBEZAN CR X 25GR', name: 'CLOBEZAN CR X 25GR', principle: 'CLOBETASOL', price: 43482.67, category: 'topical' },
+            { id: 7, ref: 'CLOBEZAN LOCION X 60ML', name: 'CLOBEZAN LOCION X 60ML', principle: 'CLOBETASOL', price: 67277.21, category: 'topical' },
+            { id: 8, ref: 'CLOBEZAN UNG X 25GR', name: 'CLOBEZAN UNG X 25GR', principle: 'CLOBETASOL', price: 55802.67, category: 'topical' },
+            { id: 9, ref: 'CUTAMYCON 500 X 1CBG', name: 'CUTAMYCON 500 X 1CBG', principle: 'CLOTRIMAZOL', price: 40462.73, category: 'gynecological' },
+            { id: 10, ref: 'CUTAMYCON CR TOPICA X 20GR', name: 'CUTAMYCON CR TOPICA X 20GR', principle: 'CLOTRIMAZOL', price: 15701.84, category: 'topical' },
+            { id: 11, ref: 'DESCONGEL F JBE X 60ML', name: 'DESCONGEL F JBE X 60ML', principle: 'FENILEFRINA + CETIRIZINA', price: 15460.37, category: 'respiratory' },
+            { id: 12, ref: 'DESCONGEL GRIPA X 10CBG', name: 'DESCONGEL GRIPA X 10CBG', principle: 'FENILEFRINA + CETIRIZINA', price: 18480.00, category: 'respiratory' },
+            { id: 13, ref: 'DESCONGEL LS X 100CAP', name: 'DESCONGEL LS X 100CAP', principle: 'FENILEFRINA + CETIRIZINA', price: 117015.98, category: 'respiratory' },
+            { id: 14, ref: 'DESCONGELITO F GOTAS X 15ML', name: 'DESCONGELITO F GOTAS X 15ML', principle: 'FENILEFRINA + CETIRIZINA', price: 15138.20, category: 'respiratory' },
+            { id: 15, ref: 'DESLORAN 5 MG X 10TBS', name: 'DESLORAN 5 MG X 10TBS', principle: 'DESLORATADINA', price: 79355.43, category: 'respiratory' },
+            { id: 16, ref: 'DESLORAN JBE 0.05% X 60ML', name: 'DESLORAN JBE 0.05% X 60ML', principle: 'DESLORATADINA', price: 78389.08, category: 'respiratory' },
+            { id: 17, ref: 'DOLFENAX 200MG X 10CAPS', name: 'DOLFENAX 200MG X 10CAPS', principle: 'A.TOLFENAMICO', price: 46985.40, category: 'analgesic' },
+            { id: 18, ref: 'DUOPAS 400/20MG X 10TBS', name: 'DUOPAS 400/20MG X 10TBS', principle: 'IBUPROFENO+H.BUTILBROMURO', price: 44529.87, category: 'gastrointestinal' },
+            { id: 19, ref: 'ESTERMAX 0.625MG CR VAG X40GR', name: 'ESTERMAX 0.625MG CR VAG X40GR', principle: 'ESTROGENOS CONJUGADOS', price: 32569.46, category: 'gynecological' },
+            { id: 20, ref: 'ESTERMAX 0.625MG X28TBS', name: 'ESTERMAX 0.625MG X28TBS', principle: 'ESTROGENOS CONJUGADOS', price: 32370.03, category: 'gynecological' },
+            { id: 21, ref: 'FEMTRIOL CR VAG X 20GR', name: 'FEMTRIOL CR VAG X 20GR (5 APLICADOR)', principle: 'ESTRIOL', price: 26502.63, category: 'gynecological' },
+            { id: 22, ref: 'FLUTURAN X 10CBG', name: 'FLUTURAN X 10CBG', principle: 'IBUPROFENO+DESLORATADINA', price: 35510.86, category: 'respiratory' },
+            { id: 23, ref: 'FLUZETRIN F GOTAS PED X 15ML', name: 'FLUZETRIN F GOTAS PED X 15ML', principle: 'CETIRIZINA+FENILEFRINA', price: 26934.60, category: 'respiratory' },
+            { id: 24, ref: 'FLUZETRIN F JBE X 60ML', name: 'FLUZETRIN F JBE X 60ML', principle: 'CETIRIZINA+FENILEFRINA', price: 35269.08, category: 'respiratory' },
+            { id: 25, ref: 'FLUZETRIN F X 10CAP', name: 'FLUZETRIN F X 10CAP', principle: 'ACETAMINOFEN+CETIRIZINA', price: 32370.03, category: 'respiratory' },
+            { id: 26, ref: 'FRIOTAN 65MG X 10CAPS', name: 'FRIOTAN 65MG X 10CAPS', principle: 'HEDERA HELIX', price: 34906.41, category: 'respiratory' },
+            { id: 27, ref: 'FRIOTAN JBE X 120ML', name: 'FRIOTAN JBE X 120ML', principle: 'HEDERA HELIX', price: 28988.19, category: 'respiratory' },
+            { id: 28, ref: 'FYNEXIN GEL 5% X 20GR', name: 'FYNEXIN GEL 5% X 20GR', principle: 'IBUPROFENO', price: 24730.86, category: 'topical' },
+            { id: 29, ref: 'HYGIENEX ANTIPIOJOS X 24S/S', name: 'HYGIENEX ANTIPIOJOS X 24S/S', principle: 'CIPERMETRINA', price: 51695.49, category: 'topical' },
+            { id: 30, ref: 'INFLABON 200MCG HFC AEROSOL', name: 'INFLABON 200MCG HFC AEROSOL', principle: 'BUDESONIDA', price: 140834.54, category: 'respiratory' },
+            { id: 31, ref: 'INFLABON 50MCG HFC AEROSOL', name: 'INFLABON 50MCG HFC AEROSOL', principle: 'BUDESONIDA', price: 119576.38, category: 'respiratory' },
+            { id: 32, ref: 'INFLACOR 4 MG AMP X 1ML', name: 'INFLACOR 4 MG AMP X 1ML', principle: 'BETAMETASONA', price: 20291.81, category: 'injectable' },
+            { id: 33, ref: 'INFLACOR 8 MG AMP X 2ML', name: 'INFLACOR 8 MG AMP X 2ML', principle: 'BETAMETASONA', price: 32304.76, category: 'injectable' },
+            { id: 34, ref: 'INFLACOR RET 3/3MG AMP X 1ML', name: 'INFLACOR RET 3/3MG AMP X 1ML', principle: 'BETAMETASONA', price: 37083.20, category: 'injectable' },
+            { id: 35, ref: 'INFLACOR RET 6/6MG AMP X 2ML', name: 'INFLACOR RET 6/6MG AMP X 2ML', principle: 'BETAMETASONA', price: 50571.55, category: 'injectable' },
+            { id: 36, ref: 'LACTULAX JBE X240ML', name: 'LACTULAX JBE X240ML', principle: 'LACTULOSA', price: 103005.21, category: 'gastrointestinal' },
+            { id: 37, ref: 'LACTULAX X 12S/S', name: 'LACTULAX X 12S/S', principle: 'LACTULOSA', price: 100492.70, category: 'gastrointestinal' },
+            { id: 38, ref: 'MULTIDOL 800MG X 30CBG', name: 'MULTIDOL 800MG X 30CBG', principle: 'IBUPROFENO', price: 82737.27, category: 'analgesic' },
+            { id: 39, ref: 'MULTIDOL EXPRESS 400MG X 48CBG (2+1)', name: 'MULTIDOL EXPRESS 400MG X 48CBG (2+1)', principle: 'IBUPROFENO', price: 121743.93, category: 'analgesic' },
+            { id: 40, ref: 'MULTIDOL EXPRESS 400MG X 48CBG', name: 'MULTIDOL EXPRESS 400MG X 48CBG', principle: 'IBUPROFENO', price: 60871.58, category: 'analgesic' },
+            { id: 41, ref: 'NEUROPRON INY 2ML X 3AMP', name: 'NEUROPRON INY 2ML X 3AMP', principle: 'COMPLEJO B', price: 88607.29, category: 'injectable' },
+            { id: 42, ref: 'NEUROPRON INY X 2ML (UNIDAD)', name: 'NEUROPRON INY X 2ML (UNIDAD)', principle: 'COMPLEJO B', price: 23431.87, category: 'injectable' },
+            { id: 43, ref: 'PARAXIN 500MG X 6TBS', name: 'PARAXIN 500MG X 6TBS', principle: 'NITAZOXANIDA', price: 81167.24, category: 'gastrointestinal' },
+            { id: 44, ref: 'PARAXIN SUSP X 30ML', name: 'PARAXIN SUSP X 30ML', principle: 'NITAZOXANIDA', price: 55802.67, category: 'gastrointestinal' },
+            { id: 45, ref: 'SIMPAUSE 100MG X 30CBG', name: 'SIMPAUSE 100MG X 30CBG', principle: 'ISOFLAVONA', price: 98922.67, category: 'gynecological' },
+            { id: 46, ref: 'TEREX CR VAG X 20GR', name: 'TEREX CR VAG X 20GR+3APLICADORES', principle: 'TERCONAZOL+DEXAMETASONA', price: 76698.16, category: 'gynecological' },
+            { id: 47, ref: 'TIBONELLA 2.5MG X 28TBS', name: 'TIBONELLA 2.5MG X 28TBS', principle: 'TIBOLONA', price: 37563.68, category: 'gynecological' },
+            { id: 48, ref: 'TRIGENTAX CR X 20GR', name: 'TRIGENTAX CR X 20GR', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA', price: 25324.38, category: 'topical' },
+            { id: 49, ref: 'TRIGENTAX CR X 40GR', name: 'TRIGENTAX CR X 40GR', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA', price: 41066.87, category: 'topical' },
+            { id: 50, ref: 'TRIGENTAX CR X 40GR X 2 GTS', name: 'TRIGENTAX CR X 40GR X 2 GTS ALCOHOL X 350ML', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA', price: 77549.47, category: 'topical' },
+            { id: 51, ref: 'TRIGENTAX LOC TOP. X 50ML', name: 'TRIGENTAX LOC TOP. X 50ML', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA', price: 52352.87, category: 'topical' },
+            { id: 52, ref: 'TRIGENTAX X 20GR X 3 GTS', name: 'TRIGENTAX X 20GR X 3 GTS 2 ALCOHOL X 120ML', principle: 'CLOTRIMAZOL+NEOMICINA+BETAMETASONA', price: 75985.45, category: 'topical' },
+            { id: 53, ref: 'VAGINSOL F OVULOS', name: 'VAGINSOL F 100+200MG X 3 OVULOS', principle: 'CLINDAMICINA+CLOTRIMAZOL', price: 97835.43, category: 'gynecological' },
+            { id: 54, ref: 'VAGINSOL F CR VAG X 20GR', name: 'VAGINSOL F CR VAG X 20GR+3 APLIC.', principle: 'CLINDAMICINA+CLOTRIMAZOL', price: 92901.27, category: 'gynecological' },
+            { id: 55, ref: 'ZAKOR 100MG X 6 TBS', name: 'ZAKOR 100MG X 6 TBS', principle: 'MEBENDAZOL', price: 7368.13, category: 'gastrointestinal' },
+            { id: 56, ref: 'ZAKOR SUSP X 30ML', name: 'ZAKOR SUSP X 30ML', principle: 'MEBENDAZOL', price: 10272.57, category: 'gastrointestinal' }
         ];
-
-        // Si usas el archivo tal cual: pega la lista completa aquí. 
-        // (En tu entorno ya la tenías; manténla idéntica.)
-
+        
         let orders = [];
-        let currentOrder = { clientName:'', supplier:'', items:[] };
+        let currentOrder = { clientName: '', supplier: '', items: [] };
         let editingOrderId = null;
         let currentFilter = 'all';
         let searchTimeout;
-
-        // === ELEMENTOS DOM ===
+        
         const productListEl = document.getElementById('productList');
         const productSearchEl = document.getElementById('productSearch');
         const clientNameInputEl = document.getElementById('clientNameInput');
@@ -306,175 +853,252 @@
         const totalValueEl = document.getElementById('totalValue');
         const totalClientsEl = document.getElementById('totalClients');
         const avgOrderValueEl = document.getElementById('avgOrderValue');
-
+        
         const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
         const liveToast = new bootstrap.Toast(document.getElementById('liveToast'));
         const toastBody = document.getElementById('toast-body-content');
         const toastIcon = document.getElementById('toastIcon');
         const createOrderTab = new bootstrap.Tab(document.getElementById('nav-create-order-tab'));
-
-        // === UTILIDADES ===
+        
         const formatCurrency = (value) => {
-            return new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP', minimumFractionDigits:0, maximumFractionDigits:0 }).format(Number(value||0));
+            return new Intl.NumberFormat('es-CO', {
+                style: 'currency',
+                currency: 'COP',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
         };
-
-        const showToast = (message, type='success') => {
-            toastIcon.className = type === 'success' ? 'fa-solid fa-check-circle text-success me-2' : 'fa-solid fa-exclamation-triangle text-warning me-2';
+        
+        const calculateOrderTotal = () => {
+            return currentOrder.items.reduce((total, item) => {
+                const product = products.find(p => p.id === item.productId);
+                return total + (product.price * item.quantity);
+            }, 0);
+        };
+        
+        const showToast = (message, type = 'success') => {
+            toastIcon.className = type === 'success' ? 
+                'fa-solid fa-check-circle text-success me-2' : 
+                'fa-solid fa-exclamation-triangle text-warning me-2';
+            
             toastBody.textContent = message;
             liveToast.show();
         };
-
-        // debounce simple
+        
+        const highlightText = (text, searchTerm) => {
+            if (!searchTerm) return text;
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<mark>\$1</mark>');
+        };
+        
         const debounce = (func, wait) => {
-            return function(...args){
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(searchTimeout);
+                    func(...args);
+                };
                 clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(()=> func(...args), wait);
+                searchTimeout = setTimeout(later, wait);
             };
         };
-
-        const calculateOrderTotal = () => {
-            return currentOrder.items.reduce((sum,item) => {
-                const prod = products.find(p => p.id === item.productId);
-                return sum + (prod ? prod.price * item.quantity : 0);
-            }, 0);
-        };
-
-        // highlight
-        const highlightText = (text, term) => {
-            if(!term) return text;
-            const re = new RegExp(`(${term})`,'gi');
-            return text.replace(re,'<mark>$1</mark>');
-        };
-
-        // === RENDER PRODUCTOS ===
-        const renderProducts = (filter='', category='all') => {
+        
+        const renderProducts = (filter = '', category = 'all') => {
             productListEl.innerHTML = '';
-            const f = (filter||'').toLowerCase();
-            const filtered = products.filter(p => (
-                (p.ref.toLowerCase().includes(f) || p.name.toLowerCase().includes(f) || p.principle.toLowerCase().includes(f)) &&
+            const lowerCaseFilter = filter.toLowerCase();
+            
+            let filtered = products.filter(p => 
+                (p.ref.toLowerCase().includes(lowerCaseFilter) || 
+                 p.name.toLowerCase().includes(lowerCaseFilter) ||
+                 p.principle.toLowerCase().includes(lowerCaseFilter)) &&
                 (category === 'all' || p.category === category)
-            ));
-            if(filtered.length === 0){
-                productListEl.innerHTML = `<div class="empty-state"><i class="fa-solid fa-search-minus"></i><p class="mb-0">No se encontraron productos</p><small>Intenta con otros términos</small></div>`;
+            );
+            
+            if (filtered.length === 0) {
+                productListEl.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-search-minus"></i>
+                        <p class="mb-0">No se encontraron productos</p>
+                        <small>Intenta con otros términos de búsqueda</small>
+                    </div>
+                `;
                 return;
             }
-
-            filtered.forEach((product, idx) => {
-                const div = document.createElement('div');
-                div.className = 'list-group-item d-flex justify-content-between align-items-center';
-                const categoryIcons = { respiratory:'fa-lungs', topical:'fa-hand-holding-medical', gastrointestinal:'fa-stomach', gynecological:'fa-venus', injectable:'fa-syringe', analgesic:'fa-tablets' };
+            
+            filtered.forEach((product, index) => {
+                const item = document.createElement('div');
+                item.className = 'list-group-item d-flex justify-content-between align-items-center fade-in';
+                item.style.animationDelay = `${index * 0.03}s`;
+                
+                const categoryIcons = {
+                    respiratory: 'fa-lungs',
+                    topical: 'fa-hand-holding-medical',
+                    gastrointestinal: 'fa-stomach',
+                    gynecological: 'fa-venus',
+                    injectable: 'fa-syringe',
+                    analgesic: 'fa-tablets'
+                };
+                
                 const icon = categoryIcons[product.category] || 'fa-pills';
-                div.innerHTML = `
+                
+                item.innerHTML = `
                     <div class="flex-grow-1 me-3">
-                        <div class="d-flex align-items-center mb-1">
+                        <div class="d-flex align-items-center mb-2">
                             <i class="fa-solid ${icon} text-primary me-2"></i>
                             <strong class="product-ref">${highlightText(product.ref, filter)}</strong>
                         </div>
                         <small class="text-muted d-block mb-1">${highlightText(product.principle, filter)}</small>
                         <span class="badge bg-primary bg-opacity-10 text-primary">${formatCurrency(product.price)}</span>
                     </div>
-                    <div class="input-group input-group-sm" style="width:170px;">
-                        <input type="number" class="form-control quantity-to-add" placeholder="Cant." min="1" max="999" value="1" aria-label="Cantidad">
-                        <button class="btn btn-primary add-product-btn" data-id="${product.id}" title="Agregar al pedido">
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                        <input type="number" class="form-control quantity-to-add" 
+                               placeholder="Cant." min="1" max="999" value="1" aria-label="Cantidad">
+                        <button class="btn btn-primary add-product-btn" data-id="${product.id}" 
+                                title="Agregar al pedido">
                             <i class="fa-solid fa-plus"></i>
                         </button>
                     </div>
                 `;
-                productListEl.appendChild(div);
+                productListEl.appendChild(item);
             });
         };
-
-        // === RENDER CARRITO ACTUAL ===
+        
         const renderCurrentOrder = () => {
-            currentOrder.clientName = (clientNameInputEl.value||'').trim();
-            currentOrder.supplier = supplierSelectEl.value || '';
-
-            const clientInfo = currentOrder.clientName ? `<i class="fa-solid fa-building me-1"></i> ${currentOrder.clientName}` : '<em class="text-muted"><i class="fa-solid fa-exclamation-triangle me-1"></i> Cliente no especificado</em>';
-            const supplierInfo = currentOrder.supplier ? `<i class="fa-solid fa-warehouse me-1"></i> ${currentOrder.supplier}` : '<em class="text-muted"><i class="fa-solid fa-exclamation-triangle me-1"></i> Depósito no seleccionado</em>';
-            currentOrderInfoEl.innerHTML = `<div class="row"><div class="col-md-6 mb-2 mb-md-0"><strong>Cliente:</strong> ${clientInfo}</div><div class="col-md-6"><strong>Depósito:</strong> ${supplierInfo}</div></div>`;
-
+            currentOrder.clientName = clientNameInputEl.value.trim();
+            currentOrder.supplier = supplierSelectEl.value;
+            
+            const clientInfo = currentOrder.clientName ? 
+                `<i class="fa-solid fa-building me-1"></i> ${currentOrder.clientName}` : 
+                '<em class="text-muted"><i class="fa-solid fa-exclamation-triangle me-1"></i> Cliente no especificado</em>';
+            
+            const supplierInfo = currentOrder.supplier ? 
+                `<i class="fa-solid fa-warehouse me-1"></i> ${currentOrder.supplier}` : 
+                '<em class="text-muted"><i class="fa-solid fa-exclamation-triangle me-1"></i> Depósito no seleccionado</em>';
+            
+            currentOrderInfoEl.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6 mb-2 mb-md-0"><strong>Cliente:</strong> ${clientInfo}</div>
+                    <div class="col-md-6"><strong>Depósito:</strong> ${supplierInfo}</div>
+                </div>
+            `;
+            
             cartItemCountEl.textContent = currentOrder.items.length;
             currentOrderItemsEl.innerHTML = '';
-
-            if(currentOrder.items.length === 0){
-                currentOrderItemsEl.innerHTML = `<div class="empty-state"><i class="fa-solid fa-cart-shopping"></i><p class="mb-0">El carrito está vacío</p><small>Agrega productos desde el catálogo</small></div>`;
+            
+            if (currentOrder.items.length === 0) {
+                currentOrderItemsEl.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <p class="mb-0">El carrito está vacío</p>
+                        <small>Agrega productos desde el catálogo</small>
+                    </div>
+                `;
                 cartTotalEl.textContent = '';
                 updateUIState();
                 return;
             }
-
+            
             const list = document.createElement('div');
             list.className = 'list-group list-group-flush';
-
-            currentOrder.items.forEach(item => {
-                const prod = products.find(p => p.id === item.productId) || { ref:'N/A', principle:'', price:0 };
-                const subtotal = (prod.price || 0) * item.quantity;
+            
+            currentOrder.items.forEach((item) => {
+                const product = products.find(p => p.id === item.productId);
+                const subtotal = product.price * item.quantity;
+                
                 const listItem = document.createElement('div');
                 listItem.className = 'list-group-item border-0 px-0';
                 listItem.innerHTML = `
                     <div class="d-flex justify-content-between align-items-start">
                         <div class="flex-grow-1 me-3">
-                            <h6 class="mb-1 fw-bold text-primary">${prod.ref}</h6>
-                            <small class="text-muted d-block">${prod.principle}</small>
-                            <span class="badge bg-success bg-opacity-10 text-success mt-1">${formatCurrency(subtotal)}</span>
+                            <h6 class="mb-1 fw-bold text-primary">${product.ref}</h6>
+                            <small class="text-muted d-block">${product.principle}</small>
+                            <span class="badge bg-success bg-opacity-10 text-success mt-1">
+                                ${formatCurrency(subtotal)}
+                            </span>
                         </div>
                         <div class="d-flex align-items-center">
-                            <input type="number" class="form-control form-control-sm quantity-input me-2" value="${item.quantity}" min="1" max="999" data-id="${prod.id}" style="width:80px;">
-                            <button class="btn btn-sm btn-outline-danger remove-item-btn" data-id="${prod.id}" title="Eliminar del pedido"><i class="fa-solid fa-trash"></i></button>
+                            <input type="number" class="form-control form-control-sm quantity-input me-2" 
+                                   value="${item.quantity}" min="1" max="999" data-id="${product.id}" 
+                                   style="width: 80px;">
+                            <button class="btn btn-sm btn-outline-danger remove-item-btn" 
+                                    data-id="${product.id}" title="Eliminar del pedido">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
                         </div>
                     </div>
                 `;
                 list.appendChild(listItem);
             });
-
+            
             currentOrderItemsEl.appendChild(list);
-            cartTotalEl.innerHTML = `<div class="d-flex justify-content-between align-items-center"><span>Total del Pedido:</span><span class="text-primary fw-bold fs-4">${formatCurrency(calculateOrderTotal())}</span></div>`;
+            cartTotalEl.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Total del Pedido:</span>
+                    <span class="text-primary fw-bold fs-4">${formatCurrency(calculateOrderTotal())}</span>
+                </div>
+            `;
             updateUIState();
         };
-
-        // === RENDER HISTORIAL (Robusto) ===
-        function renderAllOrders() {
-            // Podremos inyectar en todas las zonas que marquen la clase 'order-history-target'
-            const containers = document.querySelectorAll('.order-history-target');
-            containers.forEach(container => container.innerHTML = '');
-
-            if(!orders || orders.length === 0) {
-                const htmlEmpty = `<div class="empty-state"><i class="fa-solid fa-file-invoice"></i><p class="mb-0">No hay pedidos guardados</p><small>Los pedidos aparecerán aquí una vez creados</small></div>`;
-                containers.forEach(c => c.innerHTML = htmlEmpty);
+        
+        const updateStats = () => {
+            if (orders.length === 0) {
+                statsContainer.style.display = 'none';
                 return;
             }
-
-            // Agrupar por cliente
-            const grouped = orders.reduce((acc, order) => {
-                const client = order.clientName || 'Cliente Desconocido';
-                if(!acc[client]) acc[client] = [];
-                acc[client].push(order);
+            
+            statsContainer.style.display = 'grid';
+            
+            const totalOrders = orders.length;
+            const totalValue = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+            const uniqueClients = new Set(orders.map(order => order.clientName)).size;
+            const avgValue = totalOrders > 0 ? totalValue / totalOrders : 0;
+            
+            totalOrdersEl.textContent = totalOrders.toLocaleString();
+            totalValueEl.textContent = formatCurrency(totalValue);
+            totalClientsEl.textContent = uniqueClients.toLocaleString();
+            avgOrderValueEl.textContent = formatCurrency(avgValue);
+        };
+        
+        const renderAllOrders = () => {
+            orderHistoryContainerEl.innerHTML = '';
+            
+            if (orders.length === 0) {
+                orderHistoryContainerEl.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-file-invoice"></i>
+                        <p class="mb-0">No hay pedidos guardados</p>
+                        <small>Los pedidos aparecerán aquí una vez creados</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            const groupedOrders = orders.reduce((acc, order) => {
+                const clientName = order.clientName || "Cliente Desconocido";
+                if (!acc[clientName]) { acc[clientName] = []; }
+                acc[clientName].push(order);
                 return acc;
             }, {});
-
-            const clients = Object.keys(grouped).sort();
-
-            clients.forEach((clientName, idx) => {
-                const clientOrders = grouped[clientName];
-                // ordenar pedidos del cliente por fecha descendente (manejando timestamps)
-                clientOrders.sort((a,b) => {
-                    const aSec = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
-                    const bSec = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
-                    return bSec - aSec;
-                });
-
-                const clientTotal = clientOrders.reduce((s,o)=> s + (o.total||0), 0);
-                const accordionId = `client-collapse-${idx}`;
-
-                // Construcción del bloque acordeón
-                const accItem = document.createElement('div');
-                accItem.className = 'accordion-item';
-
-                accItem.innerHTML = `
-                    <h2 class="accordion-header" id="heading-${idx}">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${accordionId}" aria-expanded="false" aria-controls="${accordionId}">
-                            <div class="d-flex w-100 justify-content-between align-items-center">
-                                <div><i class="fa-solid fa-building me-2 text-primary"></i><strong>${clientName}</strong></div>
+            
+            const sortedClients = Object.keys(groupedOrders).sort();
+            
+            sortedClients.forEach((clientName, index) => {
+                const clientOrders = groupedOrders[clientName];
+                const clientTotal = clientOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+                const accordionItemId = `client-collapse-${index}`;
+                
+                const accordionItem = document.createElement('div');
+                accordionItem.className = 'accordion-item fade-in';
+                accordionItem.style.animationDelay = `${index * 0.08}s`;
+                
+                accordionItem.innerHTML = `
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" 
+                                data-bs-toggle="collapse" data-bs-target="#${accordionItemId}">
+                            <div class="d-flex w-100 justify-content-between align-items-center me-3">
+                                <div>
+                                    <i class="fa-solid fa-building me-2 text-primary"></i>
+                                    <strong>${clientName}</strong>
+                                </div>
                                 <div class="text-end">
                                     <span class="badge bg-primary me-2">${clientOrders.length} Pedido(s)</span>
                                     <small class="text-muted d-block mt-1">${formatCurrency(clientTotal)}</small>
@@ -482,86 +1106,89 @@
                             </div>
                         </button>
                     </h2>
-                    <div id="${accordionId}" class="accordion-collapse collapse" data-bs-parent="">
+                    <div id="${accordionItemId}" class="accordion-collapse collapse" 
+                         data-bs-parent="#orderHistoryContainer">
                         <div class="accordion-body p-0">
                             <div class="list-group list-group-flush"></div>
                         </div>
                     </div>
                 `;
-
-                // Para cada contenedor (pestaña y modal) agregamos el item
-                containers.forEach(container => container.appendChild(accItem.cloneNode(true)));
-            });
-
-            // Ahora rellenar los items internos (necesitamos hacerlo por cada contenedor por separado)
-            containers.forEach((container) => {
-                const accItems = container.querySelectorAll('.accordion-item');
-                accItems.forEach((accItem, idx) => {
-                    const clientName = Object.keys(grouped).sort()[idx];
-                    const clientOrders = grouped[clientName];
-                    const listGroup = accItem.querySelector('.list-group');
-
-                    clientOrders.forEach(order => {
-                        const itemsHtml = (order.items || []).map(item => {
-                            const product = products.find(p => p.id === item.productId) || { ref:'N/A' };
-                            return `<li class="small text-muted ps-3 py-1"><i class="fa-solid fa-pills me-1"></i>${product.ref} - <strong class="text-primary">Cant: ${item.quantity}</strong></li>`;
-                        }).join('');
-
-                        const orderDate = order.createdAt && order.createdAt.seconds ? new Date(order.createdAt.seconds * 1000).toLocaleString('es-CO', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : 'Fecha no disponible';
-
-                        const listItem = document.createElement('div');
-                        listItem.className = 'list-group-item';
-                        listItem.innerHTML = `
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fa-solid fa-warehouse me-2 text-primary"></i><strong>${order.supplier || 'N/A'}</strong>
-                                    </div>
-                                    <small class="text-muted d-block mb-2"><i class="fa-solid fa-calendar me-1"></i>${orderDate}</small>
-                                    <ul class="list-unstyled mb-2">${itemsHtml}</ul>
-                                    <div class="d-flex align-items-center">
-                                        <span class="badge bg-success me-2"><i class="fa-solid fa-dollar-sign me-1"></i>${formatCurrency(order.total || 0)}</span>
-                                        <span class="badge bg-info"><i class="fa-solid fa-box me-1"></i>${(order.items||[]).length} Producto(s)</span>
-                                    </div>
+                
+                const listGroup = accordionItem.querySelector('.list-group');
+                
+                clientOrders.forEach((order) => {
+                    const itemsHtml = order.items.map(item => {
+                        const product = products.find(p => p.id === item.productId);
+                        return `
+                            <li class="small text-muted ps-3 py-1">
+                                <i class="fa-solid fa-pills me-1"></i>
+                                ${product?.ref || 'N/A'} - 
+                                <strong class="text-primary">Cant: ${item.quantity}</strong>
+                            </li>
+                        `;
+                    }).join('');
+                    
+                    const orderDate = order.createdAt ? 
+                        new Date(order.createdAt.seconds * 1000).toLocaleString('es-CO', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) : 'Fecha no disponible';
+                    
+                    const listItem = document.createElement('div');
+                    listItem.className = 'list-group-item';
+                    listItem.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fa-solid fa-warehouse me-2 text-primary"></i>
+                                    <strong>${order.supplier || 'N/A'}</strong>
                                 </div>
-                                <div class="d-flex flex-column gap-2">
-                                    <button class="btn btn-sm btn-outline-primary edit-order-btn" data-id="${order.id}" title="Editar pedido"><i class="fa-solid fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-outline-danger delete-order-btn" data-id="${order.id}" title="Eliminar pedido"><i class="fa-solid fa-trash"></i></button>
+                                <small class="text-muted d-block mb-2">
+                                    <i class="fa-solid fa-calendar me-1"></i>
+                                    ${orderDate}
+                                </small>
+                                <ul class="list-unstyled mb-2">${itemsHtml}</ul>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-success me-2">
+                                        <i class="fa-solid fa-dollar-sign me-1"></i>
+                                        ${formatCurrency(order.total || 0)}
+                                    </span>
+                                    <span class="badge bg-info">
+                                        <i class="fa-solid fa-box me-1"></i>
+                                        ${order.items.length} Producto(s)
+                                    </span>
                                 </div>
                             </div>
-                        `;
-                        listGroup.appendChild(listItem);
-                    });
+                            <div class="d-flex flex-column gap-2">
+                                <button class="btn btn-sm btn-outline-primary edit-order-btn" 
+                                        data-id="${order.id}" title="Editar pedido">
+                                    <i class="fa-solid fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-order-btn" 
+                                        data-id="${order.id}" title="Eliminar pedido">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    listGroup.appendChild(listItem);
                 });
+                
+                orderHistoryContainerEl.appendChild(accordionItem);
             });
-        }
-
-        // === UPDATE STATS ===
-        const updateStats = () => {
-            if(!orders || orders.length === 0){
-                statsContainer.style.display = 'none';
-                return;
-            }
-            statsContainer.style.display = 'grid';
-            const totalOrders = orders.length;
-            const totalValue = orders.reduce((s,o)=> s + (o.total||0), 0);
-            const uniqueClients = new Set(orders.map(o => o.clientName || 'Cliente Desconocido')).size;
-            const avg = totalOrders ? totalValue / totalOrders : 0;
-
-            totalOrdersEl.textContent = totalOrders.toLocaleString();
-            totalValueEl.textContent = formatCurrency(totalValue);
-            totalClientsEl.textContent = uniqueClients.toLocaleString();
-            avgOrderValueEl.textContent = formatCurrency(avg);
         };
-
-        // === UI STATE ===
+        
         const updateUIState = () => {
             const hasItems = currentOrder.items.length > 0;
-            const hasClient = (currentOrder.clientName||'').trim() !== '';
-            const hasSupplier = (currentOrder.supplier||'') !== '';
-            finalizeOrderBtn.disabled = !(hasItems && hasClient && hasSupplier);
-
-            if(editingOrderId){
+            const hasClientName = currentOrder.clientName.trim() !== '';
+            const hasSupplier = currentOrder.supplier !== '';
+            
+            finalizeOrderBtn.disabled = !(hasItems && hasClientName && hasSupplier);
+            
+            if (editingOrderId) {
                 editingBanner.classList.remove('d-none');
                 cancelEditBtn.classList.remove('d-none');
             } else {
@@ -569,104 +1196,153 @@
                 cancelEditBtn.classList.add('d-none');
             }
         };
-
+        
         const clearCurrentOrder = () => {
-            currentOrder = { clientName:'', supplier:'', items:[] };
+            currentOrder = { clientName: '', supplier: '', items: [] };
             clientNameInputEl.value = '';
             supplierSelectEl.value = '';
             editingOrderId = null;
             renderCurrentOrder();
             updateUIState();
         };
-
-        // === EXPORTAR EXCEL ===
+        
         const exportToExcel = () => {
-            if(!orders || orders.length === 0){
-                showToast('No hay pedidos para exportar', 'warning'); return;
+            if (orders.length === 0) {
+                showToast('No hay pedidos para exportar', 'warning');
+                return;
             }
+            
             const data = [];
             orders.forEach(order => {
-                (order.items||[]).forEach(item => {
-                    const prod = products.find(p => p.id === item.productId) || {};
-                    const dateStr = order.createdAt && order.createdAt.seconds ? new Date(order.createdAt.seconds * 1000).toLocaleDateString('es-CO') : 'N/A';
+                order.items.forEach(item => {
+                    const product = products.find(p => p.id === item.productId);
+                    const orderDate = order.createdAt ? 
+                        new Date(order.createdAt.seconds * 1000).toLocaleDateString('es-CO') : 
+                        'N/A';
+                    
                     data.push({
-                        Fecha: dateStr,
-                        Cliente: order.clientName || 'N/A',
-                        Depósito: order.supplier || 'N/A',
-                        Referencia: prod.ref || 'N/A',
-                        Producto: prod.name || 'N/A',
-                        'Principio Activo': prod.principle || 'N/A',
-                        Cantidad: item.quantity,
-                        'Precio Unitario': prod.price || 0,
-                        Subtotal: (prod.price || 0) * item.quantity,
+                        'Fecha': orderDate,
+                        'Cliente': order.clientName || 'N/A',
+                        'Depósito': order.supplier || 'N/A',
+                        'Referencia': product?.ref || 'N/A',
+                        'Producto': product?.name || 'N/A',
+                        'Principio Activo': product?.principle || 'N/A',
+                        'Cantidad': item.quantity,
+                        'Precio Unitario': product?.price || 0,
+                        'Subtotal': (product?.price || 0) * item.quantity,
                         'Total Pedido': order.total || 0
                     });
                 });
             });
+            
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
+            
+            const colWidths = [
+                { wch: 12 }, { wch: 25 }, { wch: 15 }, { wch: 30 },
+                { wch: 40 }, { wch: 25 }, { wch: 10 }, { wch: 15 },
+                { wch: 15 }, { wch: 15 }
+            ];
+            ws['!cols'] = colWidths;
+            
             const fileName = `Pedidos_${new Date().toISOString().split('T')[0]}.xlsx`;
             XLSX.writeFile(wb, fileName);
             showToast('Archivo Excel exportado exitosamente', 'success');
         };
-
-        // === EVENTOS: agregar producto desde catálogo ===
+        
         productListEl.addEventListener('click', (e) => {
             const addBtn = e.target.closest('.add-product-btn');
-            if(!addBtn) return;
+            if (!addBtn) return;
+            
             const productId = parseInt(addBtn.dataset.id);
             const quantityInput = addBtn.closest('.input-group').querySelector('.quantity-to-add');
-            const quantity = Math.max(1, Math.min(999, parseInt(quantityInput.value || 1)));
-            const existing = currentOrder.items.find(it => it.productId === productId);
-            if(existing){ existing.quantity += quantity; } else { currentOrder.items.push({ productId, quantity }); }
+            const quantity = parseInt(quantityInput.value) || 1;
+            
+            if (quantity < 1 || quantity > 999) {
+                showToast('La cantidad debe estar entre 1 y 999', 'warning');
+                return;
+            }
+            
+            const existingItem = currentOrder.items.find(item => item.productId === productId);
+            
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                currentOrder.items.push({ productId, quantity });
+            }
+            
             quantityInput.value = 1;
             renderCurrentOrder();
-            const prod = products.find(p => p.id === productId);
-            showToast(`${quantity} unidad(es) de ${prod?.ref || 'producto'} agregado(s)`, 'success');
+            
+            const product = products.find(p => p.id === productId);
+            showToast(`${quantity} unidad(es) de ${product.ref} agregado(s) al pedido`, 'success');
         });
-
-        // === EVENTOS: modificar cantidades en carrito ===
+        
         currentOrderItemsEl.addEventListener('input', (e) => {
-            if(!e.target.classList.contains('quantity-input')) return;
-            const pid = parseInt(e.target.dataset.id);
-            let val = parseInt(e.target.value) || 1;
-            if(val < 1) val = 1;
-            if(val > 999) val = 999;
-            e.target.value = val;
-            const item = currentOrder.items.find(i => i.productId === pid);
-            if(item){ item.quantity = val; renderCurrentOrder(); }
-        });
-
-        // === EVENTOS: eliminar item del carrito ===
-        currentOrderItemsEl.addEventListener('click', (e) => {
-            const btn = e.target.closest('.remove-item-btn');
-            if(!btn) return;
-            const pid = parseInt(btn.dataset.id);
-            currentOrder.items = currentOrder.items.filter(i => i.productId !== pid);
-            renderCurrentOrder();
-            const prod = products.find(p => p.id === pid);
-            showToast(`${prod?.ref || 'Producto'} eliminado del pedido`, 'success');
-        });
-
-        // === LIMPIAR / CANCELAR EDICIÓN ===
-        clearOrderBtn.addEventListener('click', () => {
-            if(confirm('¿Estás seguro de que deseas limpiar el pedido actual?')){ clearCurrentOrder(); showToast('Pedido limpiado', 'success'); }
-        });
-        cancelEditBtn.addEventListener('click', () => {
-            if(confirm('¿Deseas cancelar la edición? Los cambios no guardados se perderán.')){ clearCurrentOrder(); showToast('Edición cancelada', 'success'); }
-        });
-
-        // === FINALIZAR PEDIDO (crear/actualizar en Firestore) ===
-        finalizeOrderBtn.addEventListener('click', async () => {
-            currentOrder.clientName = (clientNameInputEl.value||'').trim();
-            currentOrder.supplier = supplierSelectEl.value || '';
-            if(!currentOrder.clientName || !currentOrder.supplier || currentOrder.items.length === 0){
-                showToast('Por favor completa todos los campos requeridos', 'warning'); return;
+            if (!e.target.classList.contains('quantity-input')) return;
+            
+            const productId = parseInt(e.target.dataset.id);
+            const newQuantity = parseInt(e.target.value);
+            
+            if (newQuantity < 1 || newQuantity > 999) {
+                showToast('La cantidad debe estar entre 1 y 999', 'warning');
+                e.target.value = 1;
+                return;
             }
-            const orderData = { clientName: currentOrder.clientName, supplier: currentOrder.supplier, items: currentOrder.items, total: calculateOrderTotal(), createdAt: serverTimestamp() };
-            try{
-                if(editingOrderId){
+            
+            const item = currentOrder.items.find(item => item.productId === productId);
+            if (item) {
+                item.quantity = newQuantity;
+                renderCurrentOrder();
+            }
+        });
+        
+        currentOrderItemsEl.addEventListener('click', (e) => {
+            const removeBtn = e.target.closest('.remove-item-btn');
+            if (!removeBtn) return;
+            
+            const productId = parseInt(removeBtn.dataset.id);
+            currentOrder.items = currentOrder.items.filter(item => item.productId !== productId);
+            renderCurrentOrder();
+            
+            const product = products.find(p => p.id === productId);
+            showToast(`${product.ref} eliminado del pedido`, 'success');
+        });
+        
+        clearOrderBtn.addEventListener('click', () => {
+            if (confirm('¿Estás seguro de que deseas limpiar el pedido actual?')) {
+                clearCurrentOrder();
+                showToast('Pedido limpiado', 'success');
+            }
+        });
+        
+        cancelEditBtn.addEventListener('click', () => {
+            if (confirm('¿Deseas cancelar la edición? Los cambios no guardados se perderán.')) {
+                clearCurrentOrder();
+                showToast('Edición cancelada', 'success');
+            }
+        });
+        
+        finalizeOrderBtn.addEventListener('click', async () => {
+            currentOrder.clientName = clientNameInputEl.value.trim();
+            currentOrder.supplier = supplierSelectEl.value;
+            
+            if (!currentOrder.clientName || !currentOrder.supplier || currentOrder.items.length === 0) {
+                showToast('Por favor completa todos los campos requeridos', 'warning');
+                return;
+            }
+            
+            const orderData = {
+                clientName: currentOrder.clientName,
+                supplier: currentOrder.supplier,
+                items: currentOrder.items,
+                total: calculateOrderTotal(),
+                createdAt: serverTimestamp()
+            };
+            
+            try {
+                if (editingOrderId) {
                     const orderRef = doc(db, 'orders', editingOrderId);
                     await updateDoc(orderRef, orderData);
                     showToast('Pedido actualizado exitosamente', 'success');
@@ -674,91 +1350,106 @@
                     await addDoc(collection(db, 'orders'), orderData);
                     showToast('Pedido creado exitosamente', 'success');
                 }
+                
                 clearCurrentOrder();
                 cartModal.hide();
                 createOrderTab.show();
-            } catch(err){
-                console.error('Error al guardar pedido', err);
+            } catch (error) {
+                console.error('Error al guardar el pedido:', error);
                 showToast('Error al guardar el pedido. Intenta nuevamente.', 'warning');
             }
         });
-
-        // === EDICION / ELIMINACION desde historial ===
-        // Delegación de eventos: escucha en todo el contenedor de history (tanto tabs como modal)
-        document.addEventListener('click', async (e) => {
+        
+        orderHistoryContainerEl.addEventListener('click', async (e) => {
             const editBtn = e.target.closest('.edit-order-btn');
             const deleteBtn = e.target.closest('.delete-order-btn');
-            if(editBtn){
-                const id = editBtn.dataset.id;
-                const order = orders.find(o => o.id === id);
-                if(order){
-                    editingOrderId = id;
-                    currentOrder = { clientName: order.clientName || '', supplier: order.supplier || '', items: JSON.parse(JSON.stringify(order.items || [])) };
-                    clientNameInputEl.value = currentOrder.clientName;
-                    supplierSelectEl.value = currentOrder.supplier;
+            
+            if (editBtn) {
+                const orderId = editBtn.dataset.id;
+                const order = orders.find(o => o.id === orderId);
+                
+                if (order) {
+                    editingOrderId = orderId;
+                    currentOrder = {
+                        clientName: order.clientName,
+                        supplier: order.supplier,
+                        items: [...order.items]
+                    };
+                    
+                    clientNameInputEl.value = order.clientName;
+                    supplierSelectEl.value = order.supplier;
+                    
                     renderCurrentOrder();
                     createOrderTab.show();
                     cartModal.show();
                     showToast('Pedido cargado para edición', 'success');
-                } else {
-                    showToast('Pedido no encontrado para edición', 'warning');
                 }
             }
-            if(deleteBtn){
-                const id = deleteBtn.dataset.id;
-                if(confirm('¿Estás seguro de que deseas eliminar este pedido?')){
-                    try{
-                        await deleteDoc(doc(db, 'orders', id));
+            
+            if (deleteBtn) {
+                const orderId = deleteBtn.dataset.id;
+                
+                if (confirm('¿Estás seguro de que deseas eliminar este pedido?')) {
+                    try {
+                        await deleteDoc(doc(db, 'orders', orderId));
                         showToast('Pedido eliminado exitosamente', 'success');
-                    } catch(err){
-                        console.error('Error al eliminar pedido', err);
+                    } catch (error) {
+                        console.error('Error al eliminar el pedido:', error);
                         showToast('Error al eliminar el pedido', 'warning');
                     }
                 }
             }
         });
-
-        // === FILTROS y BÚSQUEDA ===
-        productSearchEl.addEventListener('input', debounce((e) => renderProducts(e.target.value, currentFilter), 300));
+        
+        productSearchEl.addEventListener('input', debounce((e) => {
+            renderProducts(e.target.value, currentFilter);
+        }, 300));
+        
+        clientNameInputEl.addEventListener('input', () => {
+            renderCurrentOrder();
+        });
+        
+        supplierSelectEl.addEventListener('change', () => {
+            renderCurrentOrder();
+        });
+        
         document.getElementById('filterChips').addEventListener('click', (e) => {
-            const chip = e.target.closest('.filter-chip'); if(!chip) return;
+            const chip = e.target.closest('.filter-chip');
+            if (!chip) return;
+            
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
             chip.classList.add('active');
-            currentFilter = chip.dataset.filter || 'all';
-            renderProducts(productSearchEl.value || '', currentFilter);
+            
+            currentFilter = chip.dataset.filter;
+            renderProducts(productSearchEl.value, currentFilter);
         });
-
+        
         document.getElementById('exportBtn').addEventListener('click', exportToExcel);
-        document.getElementById('openHistoryBtn').addEventListener('click', () => {
-            renderAllOrders();
-            const modal = new bootstrap.Modal(document.getElementById('orderHistoryModal'));
-            modal.show();
-        });
-        document.getElementById('refreshBtnHeader').addEventListener('click', () => {
-            // refresco manual: forzamos re-render (los datos llegan por onSnapshot en tiempo real de todas formas)
-            renderProducts(productSearchEl.value || '', currentFilter);
-            renderCurrentOrder();
-            renderAllOrders();
-            showToast('Actualizado', 'success');
-        });
-
-        // === SUSCRIPCION EN TIEMPO REAL: orders ===
-        onSnapshot(collection(db, 'orders'), (snapshot) => {
-            orders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            // ordenar manualmente por createdAt descendente si existe
-            orders.sort((a,b) => {
-                const aSec = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
-                const bSec = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
-                return bSec - aSec;
-            });
-            updateStats();
-            renderAllOrders();
-        }, (error) => {
-            console.error('Error al cargar pedidos:', error);
-            showToast('Error al cargar pedidos: ' + (error?.message || ''), 'warning');
-        });
-
-        // INIT
+        
+// Cargar pedidos SIN orderBy para evitar problemas de índice
+onSnapshot(collection(db, 'orders'), (snapshot) => {
+    console.log('📦 Pedidos recibidos de Firebase:', snapshot.size);
+    
+    orders = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+    }));
+    
+    // Ordenar manualmente por fecha (más reciente primero)
+    orders.sort((a, b) => {
+        if (!a.createdAt) return 1;
+        if (!b.createdAt) return -1;
+        return b.createdAt.seconds - a.createdAt.seconds;
+    });
+    
+    console.log('✅ Total de pedidos cargados:', orders.length);
+    renderAllOrders();
+    updateStats();
+}, (error) => {
+    console.error('❌ Error al cargar pedidos:', error);
+    showToast('Error al cargar pedidos: ' + error.message, 'warning');
+});
+        
         renderProducts('', 'all');
         renderCurrentOrder();
         updateUIState();
