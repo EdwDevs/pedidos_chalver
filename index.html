@@ -4,31 +4,29 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>CRM Pedidos Farmacéutico Pro — Mobile</title>
-
   <!-- Bootstrap + FontAwesome + Inter -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
   <style>
     :root{
       --primary: #2563eb;
       --primary-dark: #1d4ed8;
       --success: #10b981;
       --danger: #ef4444;
+      --warning: #f59e0b;
       --muted: #6b7280;
       --card-shadow: 0 4px 18px rgba(2,6,23,0.06);
       --glass: rgba(255,255,255,0.85);
       --radius: 12px;
       --gap: .8rem;
       --touch: 48px;
+      --transition: all 0.2s ease;
     }
-
     /* Mobile-first base */
     *{ box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     html,body{ height:100%; margin:0; background:#f8fafc; color:#0f172a; -webkit-font-smoothing:antialiased; }
     a{ text-decoration:none; }
-
     /* Header */
     .main-header{
       background: linear-gradient(135deg,#667eea 0%, #764ba2 100%);
@@ -41,54 +39,49 @@
       position:sticky;
       top:0; z-index:1100;
       box-shadow: var(--card-shadow);
+      transition: var(--transition);
     }
     .main-header .brand { display:flex; align-items:center; gap:.6rem; }
     .main-header h1{ font-size:1.05rem; margin:0; font-weight:700; letter-spacing:.2px; }
     .main-header small { display:block; font-size:.75rem; opacity:.9; margin-top:2px; }
-
     /* Layout */
     main.container-fluid{ padding: .9rem 1rem 6.5rem; } /* bottom padding for nav */
     .stats-container{ display:grid; grid-template-columns: repeat(2,1fr); gap: .6rem; margin-bottom: .9rem; }
-    .stat-card{ background:white; border-radius:10px; padding:.8rem; box-shadow:var(--card-shadow); text-align:center; }
+    .stat-card{ background:white; border-radius:10px; padding:.8rem; box-shadow:var(--card-shadow); text-align:center; transition: var(--transition); }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(2,6,23,0.1); }
     .stat-value{ font-weight:700; color:var(--primary); font-size:1.1rem; display:block; }
-
     /* Filters + search */
     .filters-container{ background:white; border-radius:12px; padding:.7rem; box-shadow:var(--card-shadow); margin-bottom:.8rem; }
-    .filter-chip{ display:inline-flex; align-items:center; gap:.45rem; padding:.45rem .8rem; border-radius:999px; background:rgba(37,99,235,0.06); color:var(--primary); font-weight:600; margin-right:.4rem; margin-bottom:.4rem; font-size:.85rem; min-height:40px; }
+    .filter-chip{ display:inline-flex; align-items:center; gap:.45rem; padding:.45rem .8rem; border-radius:999px; background:rgba(37,99,235,0.06); color:var(--primary); font-weight:600; margin-right:.4rem; margin-bottom:.4rem; font-size:.85rem; min-height:40px; transition: var(--transition); }
     .filter-chip.active{ background:var(--primary); color:white; transform:scale(1.02); }
-
     .search-row .input-group-text{ background:white; border-right:0; border-radius:10px 0 0 10px; }
     .search-row .form-control{ border-radius:0 10px 10px 0; min-height:46px; }
-
     /* Product list */
     .product-list-container{ max-height: calc(100vh - 360px); overflow:auto; -webkit-overflow-scrolling:touch; padding: .4rem 0; }
-    .list-group-item{ background:white; border-radius:12px; margin-bottom:.6rem; padding:.9rem; box-shadow:var(--card-shadow); display:flex; align-items:center; gap:.6rem; justify-content:space-between; }
+    .list-group-item{ background:white; border-radius:12px; margin-bottom:.6rem; padding:.9rem; box-shadow:var(--card-shadow); display:flex; align-items:center; gap:.6rem; justify-content:space-between; transition: var(--transition); }
+    .list-group-item:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(2,6,23,0.1); }
     .product-meta{ flex:1; min-width:0; }
     .product-ref{ font-weight:700; font-size:.95rem; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .product-principle{ color:var(--muted); font-size:.82rem; display:block; margin-top:4px; }
     .product-price{ margin-top:6px; display:inline-block; font-weight:700; color:var(--primary); font-size:.95rem; }
-
     .product-actions{ display:flex; gap:.5rem; align-items:center; }
     .quantity-to-add{ width:90px; min-width:72px; }
-
     /* Floating cart */
-    .fab-cart{ position:fixed; right:14px; bottom:110px; z-index:1200; width:64px; height:64px; border-radius:999px; display:flex; align-items:center; justify-content:center; color:#fff; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); box-shadow:0 10px 30px rgba(37,99,235,0.18); border:none; }
+    .fab-cart{ position:fixed; right:14px; bottom:110px; z-index:1200; width:64px; height:64px; border-radius:999px; display:flex; align-items:center; justify-content:center; color:#fff; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); box-shadow:0 10px 30px rgba(37,99,235,0.18); border:none; transition: var(--transition); }
+    .fab-cart:active { transform: scale(0.95); }
     .fab-cart .badge{ position:absolute; top:-8px; right:-8px; min-width:22px; height:22px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; background:var(--danger); color:white; font-weight:700; font-size:.75rem; }
-
     /* Bottom nav */
     .bottom-nav{ position:fixed; left:0; right:0; bottom:0; background:white; border-top:1px solid #e6e9ef; z-index:1100; padding:.5rem 0; display:flex; justify-content:space-around; box-shadow: 0 -6px 24px rgba(2,6,23,0.04); }
-    .bottom-nav a{ display:flex; flex-direction:column; gap:4px; align-items:center; color:var(--muted); font-weight:700; font-size:.82rem; padding:.25rem .5rem; }
+    .bottom-nav a{ display:flex; flex-direction:column; gap:4px; align-items:center; color:var(--muted); font-weight:700; font-size:.82rem; padding:.25rem .5rem; transition: var(--transition); }
     .bottom-nav a.active{ color:var(--primary); }
-
+    .bottom-nav a:active { transform: scale(0.95); }
     /* Modal tweaks */
     .modal-content{ border-radius:14px; overflow:hidden; }
     .modal-header{ background:linear-gradient(135deg,#dbeafe 0%,#bfdbfe 100%); border-bottom:0; }
     .modal-body .list-group-item{ padding:.6rem; border-radius:10px; }
-
     /* Empty states + small elements */
     .empty-state{ text-align:center; padding:2.2rem 0; color:var(--muted); }
     mark{ background: linear-gradient(135deg, rgba(255,235,59,0.35), rgba(255,193,7,0.35)); padding:2px 4px; border-radius:4px; }
-
     /* Responsive: Moto G56-ish */
     @media (min-width:600px){
       .stats-container{ grid-template-columns: repeat(4,1fr); }
@@ -98,10 +91,38 @@
       main.container-fluid{ padding-left:2.2rem; padding-right:2.2rem; }
       .product-list-container{ max-height: calc(100vh - 480px); }
     }
+    /* Search suggestions */
+    #search-suggestions {
+      display: none;
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 8px;
+      z-index: 1000;
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .suggestion-item {
+      padding: 8px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+    .suggestion-item:hover {
+      background-color: #f8f9fa;
+    }
+    /* Form validation */
+    .is-invalid {
+      border-color: var(--danger) !important;
+    }
+    .invalid-feedback {
+      color: var(--danger);
+      font-size: 0.875em;
+    }
   </style>
 </head>
 <body>
-
   <!-- HEADER -->
   <header class="main-header" role="banner">
     <div class="brand">
@@ -111,7 +132,6 @@
         <small>Gestión de pedidos • móvile-friendly</small>
       </div>
     </div>
-
     <div style="display:flex; gap:.5rem; align-items:center;">
       <button id="openHistoryBtn" class="btn btn-sm btn-light" title="Abrir historial" aria-label="Abrir historial">
         <i class="fa-solid fa-history"></i>
@@ -121,7 +141,6 @@
       </button>
     </div>
   </header>
-
   <!-- MAIN -->
   <main class="container-fluid">
     <section class="stats-container" id="statsContainer" aria-hidden="true" style="display:none;">
@@ -142,7 +161,6 @@
         <small class="text-muted"><i class="fa-solid fa-chart-line me-1"></i> Promedio</small>
       </div>
     </section>
-
     <!-- CREATE / FORM -->
     <section class="mb-3">
       <div class="card" style="padding:.6rem;">
@@ -150,11 +168,11 @@
           <div id="editing-banner" class="alert alert-warning d-none small" role="alert">
             <i class="fa-solid fa-pencil me-2"></i><strong>Modo edición:</strong> estás modificando un pedido.
           </div>
-
           <div class="row gy-2">
             <div class="col-12 col-md-6">
               <label class="form-label small"><i class="fa-solid fa-building me-1"></i> Nombre del cliente</label>
               <input id="clientNameInput" class="form-control" type="text" placeholder="Ej: Droguería La Principal" inputmode="text" />
+              <div class="invalid-feedback">Por favor ingresa el nombre del cliente.</div>
             </div>
             <div class="col-12 col-md-6">
               <label class="form-label small"><i class="fa-solid fa-warehouse me-1"></i> Depósito</label>
@@ -163,12 +181,12 @@
                 <option value="DROSAN">DROSAN</option>
                 <option value="UNIDROGAS">UNIDROGAS</option>
               </select>
+              <div class="invalid-feedback">Por favor selecciona un depósito.</div>
             </div>
           </div>
         </div>
       </div>
     </section>
-
     <!-- FILTERS -->
     <section class="filters-container mb-3" aria-label="Filtros">
       <div class="d-flex align-items-center justify-content-between mb-2">
@@ -177,7 +195,6 @@
           <h6 class="mb-0" style="font-size:.95rem;">Filtros rápidos</h6>
         </div>
       </div>
-
       <div id="filterChips" aria-hidden="false">
         <button class="filter-chip active" data-filter="all" type="button"><i class="fa-solid fa-list me-1"></i>Todos</button>
         <button class="filter-chip" data-filter="respiratory" type="button"><i class="fa-solid fa-lungs me-1"></i>Respiratorio</button>
@@ -186,7 +203,6 @@
         <button class="filter-chip" data-filter="gynecological" type="button"><i class="fa-solid fa-venus me-1"></i>Ginecológico</button>
       </div>
     </section>
-
     <!-- SEARCH + PRODUCTS -->
     <section class="card mb-3" style="padding:0;">
       <div class="card-header" style="padding:.5rem;">
@@ -194,8 +210,8 @@
           <span class="input-group-text"><i class="fa-solid fa-search"></i></span>
           <input id="productSearch" type="search" class="form-control" placeholder="Buscar por nombre, referencia o principio activo..." aria-label="Buscar productos" />
         </div>
+        <div id="search-suggestions"></div>
       </div>
-
       <div class="card-body product-list-container" id="productList" role="list">
         <!-- Lista poblada por JS -->
         <div class="empty-state">
@@ -205,19 +221,22 @@
       </div>
     </section>
   </main>
-
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav" role="navigation" aria-label="Navegación inferior">
-    <a href="#create-order" id="nav-create-order" class="active" role="button" aria-pressed="true"><i class="fa-solid fa-plus-circle"></i><small>Crear</small></a>
-    <a href="#history" id="nav-history" role="button"><i class="fa-solid fa-list-alt"></i><small>Historial</small></a>
+    <a href="#create-order" id="nav-create-order" class="active" role="button" aria-pressed="true" aria-label="Crear nuevo pedido">
+      <i class="fa-solid fa-plus-circle"></i>
+      <small>Crear</small>
+    </a>
+    <a href="#history" id="nav-history" role="button" aria-label="Ver historial de pedidos">
+      <i class="fa-solid fa-list-alt"></i>
+      <small>Historial</small>
+    </a>
   </nav>
-
   <!-- FAB CART -->
   <button class="fab-cart" id="openCartBtn" aria-label="Abrir carrito" title="Abrir carrito">
     <i class="fa-solid fa-cart-shopping" style="font-size:1.15rem;"></i>
     <span class="badge" id="cart-item-count">0</span>
   </button>
-
   <!-- CART MODAL -->
   <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-lg">
@@ -245,7 +264,6 @@
       </div>
     </div>
   </div>
-
   <!-- ORDER HISTORY MODAL -->
   <div class="modal fade" id="orderHistoryModal" tabindex="-1" aria-labelledby="orderHistoryLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -263,7 +281,6 @@
       </div>
     </div>
   </div>
-
   <!-- Toast -->
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -275,16 +292,13 @@
       <div class="toast-body" id="toast-body-content"></div>
     </div>
   </div>
-
   <!-- Libs -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
   <!-- App Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-
     /* -------------------------
        Firebase config (igual)
        ------------------------- */
@@ -298,7 +312,6 @@
     };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
     /* -------------------------
        Data (productos)
        ------------------------- */
@@ -360,7 +373,6 @@
       { id: 55, ref: 'ZAKOR 100MG X 6 TBS', name: 'ZAKOR 100MG X 6 TBS', principle: 'MEBENDAZOL', price: 7368.13, category: 'gastrointestinal' },
       { id: 56, ref: 'ZAKOR SUSP X 30ML', name: 'ZAKOR SUSP X 30ML', principle: 'MEBENDAZOL', price: 10272.57, category: 'gastrointestinal' }
     ];
-
     /* -------------------------
        Estado app
        ------------------------- */
@@ -369,7 +381,6 @@
     let editingOrderId = null;
     let currentFilter = 'all';
     let searchTimer = null;
-
     /* -------------------------
        Elementos DOM
        ------------------------- */
@@ -391,25 +402,22 @@
     const totalValueEl = document.getElementById('totalValue');
     const totalClientsEl = document.getElementById('totalClients');
     const avgOrderValueEl = document.getElementById('avgOrderValue');
-
     const cartModalEl = document.getElementById('cartModal');
     const cartModal = new bootstrap.Modal(cartModalEl, { keyboard: true, focus: true });
     const historyModal = new bootstrap.Modal(document.getElementById('orderHistoryModal'), { keyboard:true });
     const liveToast = new bootstrap.Toast(document.getElementById('liveToast'));
     const toastBody = document.getElementById('toast-body-content');
     const toastIcon = document.getElementById('toastIcon');
-
+    const suggestionsContainer = document.getElementById('search-suggestions');
     /* -------------------------
        Utilidades
        ------------------------- */
     const formatCurrency = (value) => new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP', maximumFractionDigits:0 }).format(Number(value||0));
-
     const showToast = (message, type='success') => {
       toastIcon.className = type === 'success' ? 'fa-solid fa-check-circle text-success me-2' : 'fa-solid fa-exclamation-triangle text-warning me-2';
       toastBody.textContent = message;
       liveToast.show();
     };
-
     const safeGetTimestamp = (obj) => {
       // devuelve segundos (number) o 0 si no existe
       if(!obj) return 0;
@@ -417,14 +425,12 @@
       if(obj.toMillis) return Math.floor(obj.toMillis()/1000);
       return 0;
     };
-
     const debounce = (fn, ms=300) => {
       return (...args) => {
         clearTimeout(searchTimer);
         searchTimer = setTimeout(()=> fn(...args), ms);
       };
     };
-
     /* -------------------------
        Render productos (eficiente)
        ------------------------- */
@@ -433,18 +439,15 @@
       const re = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
       return text.replace(re, '<mark>$1</mark>');
     }
-
     function renderProducts(filter = '', category = 'all') {
       productListEl.innerHTML = '';
       const f = (filter || '').trim().toLowerCase();
-
       const fragment = document.createDocumentFragment();
       const filtered = products.filter(p => {
         const matchesFilter = !f || p.ref.toLowerCase().includes(f) || p.name.toLowerCase().includes(f) || p.principle.toLowerCase().includes(f);
         const matchesCategory = category === 'all' || p.category === category;
         return matchesFilter && matchesCategory;
       });
-
       if(filtered.length === 0){
         const empty = document.createElement('div');
         empty.className = 'empty-state';
@@ -452,7 +455,6 @@
         productListEl.appendChild(empty);
         return;
       }
-
       filtered.forEach(prod => {
         const item = document.createElement('div');
         item.className = 'list-group-item';
@@ -471,10 +473,8 @@
         `;
         fragment.appendChild(item);
       });
-
       productListEl.appendChild(fragment);
     }
-
     /* -------------------------
        Carrito / order management
        ------------------------- */
@@ -484,21 +484,17 @@
         return s + ((p?.price||0) * (it.quantity||0));
       },0);
     }
-
     function renderCurrentOrder(){
       // actualiza currentOrder desde inputs
       currentOrder.clientName = (clientNameInputEl.value||'').trim();
       currentOrder.supplier = supplierSelectEl.value || '';
-
       // info header
       const clientInfo = currentOrder.clientName ? `<i class="fa-solid fa-building me-1"></i> ${currentOrder.clientName}` : '<em class="text-muted"><i class="fa-solid fa-exclamation-triangle me-1"></i> Cliente no especificado</em>';
       const supplierInfo = currentOrder.supplier ? `<i class="fa-solid fa-warehouse me-1"></i> ${currentOrder.supplier}` : '<em class="text-muted"><i class="fa-solid fa-exclamation-triangle me-1"></i> Depósito no seleccionado</em>';
       currentOrderInfoEl.innerHTML = `<div class="small"><strong>Cliente:</strong> ${clientInfo} • <strong>Depósito:</strong> ${supplierInfo}</div>`;
-
       // items
       currentOrderItemsEl.innerHTML = '';
       cartItemCountEl.textContent = currentOrder.items.length;
-
       if(currentOrder.items.length === 0){
         currentOrderItemsEl.innerHTML = `<div class="empty-state"><i class="fa-solid fa-cart-shopping" style="font-size:1.4rem;opacity:.6"></i><p class="mb-0">El carrito está vacío</p><small>Agrega productos desde el catálogo</small></div>`;
         cartTotalEl.textContent = '';
@@ -506,7 +502,6 @@
         localSaveOrder();
         return;
       }
-
       const frag = document.createDocumentFragment();
       currentOrder.items.forEach(it=>{
         const p = products.find(x=>x.id===it.productId) || { ref:'N/A', principle:'', price:0 };
@@ -528,19 +523,16 @@
         `;
         frag.appendChild(el);
       });
-
       currentOrderItemsEl.appendChild(frag);
       cartTotalEl.innerHTML = `<div>Total del pedido: <span class="fw-bold text-primary">${formatCurrency(calculateOrderTotal())}</span></div>`;
       updateUIState();
       localSaveOrder();
     }
-
     function updateUIState(){
       const hasItems = currentOrder.items.length>0;
       const hasClient = (currentOrder.clientName||'').trim().length>0;
       const hasSupplier = (currentOrder.supplier||'') !== '';
       finalizeOrderBtn.disabled = !(hasItems && hasClient && hasSupplier);
-
       if(editingOrderId){
         editingBanner.classList.remove('d-none');
         cancelEditBtn.classList.remove('d-none');
@@ -548,11 +540,9 @@
         editingBanner.classList.add('d-none');
         cancelEditBtn.classList.add('d-none');
       }
-
       // stats visibility
       statsContainer.style.display = orders.length>0 ? 'grid' : 'none';
     }
-
     function localSaveOrder(){
       // Guardado temporal para continuidad en móvil
       try{
@@ -575,7 +565,6 @@
     function localClear(){
       try { localStorage.removeItem('crm_current_order'); } catch(e){}
     }
-
     /* -------------------------
        Export Excel
        ------------------------- */
@@ -600,14 +589,12 @@
           });
         });
       });
-
       const ws = XLSX.utils.json_to_sheet(data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb,ws,'Pedidos');
       XLSX.writeFile(wb, `Pedidos_${new Date().toISOString().split('T')[0]}.xlsx`);
       showToast('Archivo Excel exportado', 'success');
     }
-
     /* -------------------------
        Render historial (agrupa por cliente)
        ------------------------- */
@@ -617,7 +604,6 @@
         orderHistoryContainerEl.innerHTML = `<div class="empty-state"><i class="fa-solid fa-file-invoice" style="font-size:1.4rem;opacity:.6"></i><p class="mt-2 mb-0">No hay pedidos guardados</p><small>Los pedidos aparecerán aquí</small></div>`;
         return;
       }
-
       // agrupar por cliente
       const grouped = orders.reduce((acc,o)=>{
         const key = o.clientName || 'Cliente Desconocido';
@@ -625,15 +611,12 @@
         acc[key].push(o);
         return acc;
       }, {});
-
       const clients = Object.keys(grouped).sort();
       const frag = document.createDocumentFragment();
-
       clients.forEach((clientName, idx)=>{
         const clientOrders = grouped[clientName];
         const clientTotal = clientOrders.reduce((s,o)=> s + (o.total||0), 0);
         const accId = `client-${idx}`;
-
         const item = document.createElement('div');
         item.className = 'accordion-item mb-2';
         item.innerHTML = `
@@ -655,7 +638,6 @@
           </div>
         `;
         frag.appendChild(item);
-
         // fill orders
         setTimeout(()=>{ // timeout to ensure DOM in place if needed
           const listGroup = item.querySelector(`.list-client-${idx}`);
@@ -685,12 +667,9 @@
             listGroup.appendChild(el);
           });
         },0);
-
       });
-
       orderHistoryContainerEl.appendChild(frag);
     }
-
     /* -------------------------
        Listeners: catálogo
        ------------------------- */
@@ -700,16 +679,13 @@
       const productId = Number(addBtn.dataset.id);
       const qInput = addBtn.closest('.product-actions')?.querySelector('.quantity-to-add') || addBtn.parentElement.querySelector('.quantity-to-add');
       const qty = Math.max(1, Math.min(999, Number(qInput?.value||1)));
-
       const found = currentOrder.items.find(x=>x.productId===productId);
       if(found) found.quantity = Math.min(999, found.quantity + qty);
       else currentOrder.items.push({ productId, quantity: qty });
-
       if(qInput) qInput.value = 1;
       renderCurrentOrder();
       showToast(`+${qty} agregadas al pedido`, 'success');
     });
-
     /* -------------------------
        Carrito: cambiar cantidad y eliminar
        ------------------------- */
@@ -721,7 +697,6 @@
       const item = currentOrder.items.find(x=>x.productId===pid);
       if(item){ item.quantity = val; renderCurrentOrder(); }
     });
-
     currentOrderItemsEl.addEventListener('click', (e)=>{
       const btn = e.target.closest('.remove-item-btn');
       if(!btn) return;
@@ -730,7 +705,6 @@
       renderCurrentOrder();
       showToast('Artículo eliminado', 'success');
     });
-
     /* -------------------------
        Clear / cancel edit
        ------------------------- */
@@ -745,7 +719,6 @@
         showToast('Pedido limpiado', 'success');
       }
     });
-
     cancelEditBtn.addEventListener('click', ()=>{
       if(confirm('Cancelar edición (se perderán los cambios)?')){
         currentOrder = { clientName:'', supplier:'', items:[] };
@@ -757,7 +730,6 @@
         showToast('Edición cancelada', 'success');
       }
     });
-
     /* -------------------------
        Finalizar pedido -> Firestore
        ------------------------- */
@@ -767,7 +739,6 @@
       if(!currentOrder.clientName || !currentOrder.supplier || currentOrder.items.length===0){
         showToast('Completa cliente, depósito y agrega productos', 'warning'); return;
       }
-
       const payload = { clientName: currentOrder.clientName, supplier: currentOrder.supplier, items: currentOrder.items, total: calculateOrderTotal(), createdAt: serverTimestamp() };
       try {
         if(editingOrderId){
@@ -789,7 +760,6 @@
         showToast('Error guardando pedido', 'warning');
       }
     });
-
     /* -------------------------
        Delegación: editar/eliminar desde historial (modal)
        ------------------------- */
@@ -808,7 +778,6 @@
         setTimeout(()=> cartModal.show(), 250);
         showToast('Pedido cargado para edición', 'success');
       }
-
       const delBtn = e.target.closest('.delete-order-btn');
       if(delBtn){
         const id = delBtn.dataset.id;
@@ -821,15 +790,39 @@
           showToast('Error al eliminar', 'warning');
         }
       }
+      // Manejo de sugerencias de búsqueda
+      const suggestionItem = e.target.closest('.suggestion-item');
+      if (suggestionItem) {
+        const productId = Number(suggestionItem.dataset.id);
+        const product = products.find(p => p.id === productId);
+        if (product) {
+          productSearchEl.value = product.ref;
+          suggestionsContainer.style.display = 'none';
+          renderProducts(product.ref, currentFilter);
+        }
+      }
     });
-
     /* -------------------------
        Búsqueda + filtros
        ------------------------- */
     productSearchEl.addEventListener('input', debounce((e)=> {
-      renderProducts(e.target.value || '', currentFilter);
+      const searchTerm = e.target.value.trim().toLowerCase();
+      renderProducts(searchTerm, currentFilter);
+      // Mostrar sugerencias si hay un término de búsqueda
+      if (searchTerm.length > 2) {
+        const suggestions = products.filter(p =>
+          p.ref.toLowerCase().includes(searchTerm) ||
+          p.name.toLowerCase().includes(searchTerm) ||
+          p.principle.toLowerCase().includes(searchTerm)
+        ).slice(0, 5); // Limitar a 5 sugerencias
+        suggestionsContainer.innerHTML = suggestions.map(p =>
+          `<div class="suggestion-item" data-id="${p.id}">${p.ref} - ${p.name}</div>`
+        ).join('');
+        suggestionsContainer.style.display = 'block';
+      } else {
+        suggestionsContainer.style.display = 'none';
+      }
     }, 220));
-
     document.getElementById('filterChips').addEventListener('click', (e)=>{
       const chip = e.target.closest('[data-filter]');
       if(!chip) return;
@@ -838,7 +831,6 @@
       currentFilter = chip.dataset.filter || 'all';
       renderProducts(productSearchEl.value || '', currentFilter);
     });
-
     /* -------------------------
        Buttons header / nav
        ------------------------- */
@@ -852,7 +844,6 @@
       renderAllOrders();
       showToast('Actualizado', 'success');
     });
-
     document.getElementById('openCartBtn').addEventListener('click', ()=> cartModal.show());
     document.getElementById('nav-history').addEventListener('click', (e)=>{
       e.preventDefault();
@@ -864,9 +855,7 @@
       // scroll to top (create area)
       window.scrollTo({ top: 0, behavior:'smooth' });
     });
-
     document.getElementById('exportBtn').addEventListener('click', exportToExcel);
-
     /* -------------------------
        Firestore realtime listener (orders)
        ------------------------- */
@@ -893,7 +882,24 @@
       console.error('Error cargando pedidos:', err);
       showToast('Error cargando pedidos: ' + (err.message || ''), 'warning');
     });
-
+    /* -------------------------
+       Validación de formularios en tiempo real
+       ------------------------- */
+    clientNameInputEl.addEventListener('input', (e) => {
+      const value = e.target.value.trim();
+      if (value.length === 0) {
+        e.target.classList.add('is-invalid');
+      } else {
+        e.target.classList.remove('is-invalid');
+      }
+    });
+    supplierSelectEl.addEventListener('change', (e) => {
+      if (!e.target.value) {
+        e.target.classList.add('is-invalid');
+      } else {
+        e.target.classList.remove('is-invalid');
+      }
+    });
     /* -------------------------
        Inicialización
        ------------------------- */
@@ -902,14 +908,12 @@
       renderProducts('', 'all');
       renderCurrentOrder();
       updateUIState();
-
       // si había pedido en local show a hint
       try{
         const saved = localStorage.getItem('crm_current_order');
         if(saved) showToast('Pedido en curso recuperado', 'success');
       }catch(e){}
     })();
-
     /* -------------------------
        Accessibility: close modals on ESC handled by bootstrap
        ------------------------- */
