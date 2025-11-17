@@ -24,6 +24,7 @@
       --transition: all 0.2s ease;
       --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       --hover-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      --font-size: 1rem;
     }
 
     /* Mobile-first base */
@@ -39,6 +40,7 @@
       background: #f8fafc;
       color: #0f172a;
       -webkit-font-smoothing: antialiased;
+      font-size: var(--font-size);
     }
 
     a {
@@ -389,63 +391,127 @@
       outline-offset: 2px;
     }
 
+    /* Settings modal */
+    .settings-modal {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .theme-option {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .theme-option:hover {
+      background-color: rgba(37, 99, 235, 0.06);
+    }
+
+    .theme-option.active {
+      background-color: rgba(37, 99, 235, 0.12);
+      border: 1px solid var(--primary);
+    }
+
+    .theme-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.8rem;
+    }
+
+    .light-theme {
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    .dark-theme {
+      background-color: #1f2937;
+      color: #f9fafb;
+    }
+
     /* Tema oscuro */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --primary: #3b82f6;
-        --primary-dark: #2563eb;
-        --success: #10b981;
-        --danger: #ef4444;
-        --warning: #f59e0b;
-        --muted: #9ca3af;
-        --card-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
-        --glass: rgba(0, 0, 0, 0.85);
-        --radius: 12px;
-        --gap: .8rem;
-        --touch: 48px;
-        --transition: all 0.2s ease;
-        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        --hover-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-      }
+    .dark-mode {
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --muted: #9ca3af;
+      --card-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+      --glass: rgba(0, 0, 0, 0.85);
+      --radius: 12px;
+      --gap: .8rem;
+      --touch: 48px;
+      --transition: all 0.2s ease;
+      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      --hover-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
 
-      body {
-        background-color: #1f2937;
-        color: #f9fafb;
-      }
+    .dark-mode body {
+      background-color: #1f2937;
+      color: #f9fafb;
+    }
 
-      .main-header {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
-      }
+    .dark-mode .main-header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+    }
 
-      .stat-card, .list-group-item, .card, .filters-container {
-        background-color: #374151;
-        border-color: #4b5563;
-      }
+    .dark-mode .stat-card,
+    .dark-mode .list-group-item,
+    .dark-mode .card,
+    .dark-mode .filters-container {
+      background-color: #374151;
+      border-color: #4b5563;
+    }
 
-      .form-control {
-        background-color: #374151;
-        border-color: #4b5563;
-        color: #f9fafb;
-      }
+    .dark-mode .form-control {
+      background-color: #374151;
+      border-color: #4b5563;
+      color: #f9fafb;
+    }
 
-      .form-control:focus {
-        background-color: #374151;
-        border-color: var(--primary);
-        color: #f9fafb;
-      }
+    .dark-mode .form-control:focus {
+      background-color: #374151;
+      border-color: var(--primary);
+      color: #f9fafb;
+    }
 
-      .bottom-nav {
-        background-color: #374151;
-        border-top-color: #4b5563;
-      }
+    .dark-mode .bottom-nav {
+      background-color: #374151;
+      border-top-color: #4b5563;
+    }
 
-      .bottom-nav a {
-        color: #9ca3af;
-      }
+    .dark-mode .bottom-nav a {
+      color: #9ca3af;
+    }
 
-      .bottom-nav a.active {
-        color: var(--primary);
-      }
+    .dark-mode .bottom-nav a.active {
+      color: var(--primary);
+    }
+
+    .dark-mode .empty-state {
+      color: #9ca3af;
+    }
+
+    .dark-mode .filter-chip {
+      background: rgba(55, 65, 81, 0.6);
+      color: #f9fafb;
+    }
+
+    .dark-mode .filter-chip.active {
+      background: var(--primary);
+    }
+
+    .dark-mode .text-muted {
+      color: #9ca3af !important;
     }
   </style>
 </head>
@@ -465,6 +531,9 @@
       </button>
       <button id="refreshBtnHeader" class="btn btn-sm btn-outline-light" title="Actualizar" aria-label="Actualizar">
         <i class="fa-solid fa-rotate"></i>
+      </button>
+      <button id="openSettingsBtn" class="btn btn-sm btn-light" title="Configuración" aria-label="Configuración">
+        <i class="fa-solid fa-gear"></i>
       </button>
     </div>
   </header>
@@ -608,6 +677,68 @@
       </div>
     </div>
   </div>
+  <!-- SETTINGS MODAL -->
+  <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered settings-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="settingsModalLabel"><i class="fa-solid fa-gear me-2"></i>Configuración</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-4">
+            <h6 class="mb-3"><i class="fa-solid fa-moon me-2"></i>Tema</h6>
+            <div class="d-flex flex-column gap-2">
+              <div class="theme-option light-theme active" data-theme="light">
+                <div class="theme-icon" style="background-color: #f8fafc; color: #0f172a;">
+                  <i class="fa-solid fa-sun"></i>
+                </div>
+                <div>
+                  <strong>Modo Claro</strong>
+                  <div class="small text-muted">Tema claro para mejor visibilidad</div>
+                </div>
+                <i class="fa-solid fa-check ms-auto text-primary"></i>
+              </div>
+              <div class="theme-option dark-theme" data-theme="dark">
+                <div class="theme-icon" style="background-color: #1f2937; color: #f9fafb;">
+                  <i class="fa-solid fa-moon"></i>
+                </div>
+                <div>
+                  <strong>Modo Oscuro</strong>
+                  <div class="small text-muted">Tema oscuro para reducir fatiga visual</div>
+                </div>
+                <i class="fa-solid fa-check ms-auto text-primary d-none"></i>
+              </div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <h6 class="mb-3"><i class="fa-solid fa-text-height me-2"></i>Tamaño de Fuente</h6>
+            <div class="d-flex flex-column gap-2">
+              <button class="btn btn-outline-primary font-size-btn active" data-size="small">Pequeña</button>
+              <button class="btn btn-outline-primary font-size-btn" data-size="medium">Mediana</button>
+              <button class="btn btn-outline-primary font-size-btn" data-size="large">Grande</button>
+            </div>
+          </div>
+          <div class="mb-4">
+            <h6 class="mb-3"><i class="fa-solid fa-bell me-2"></i>Notificaciones</h6>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="notificationsSwitch" checked>
+              <label class="form-check-label" for="notificationsSwitch">Activar notificaciones</label>
+            </div>
+          </div>
+          <div class="mb-4">
+            <h6 class="mb-3"><i class="fa-solid fa-database me-2"></i>Datos</h6>
+            <button class="btn btn-outline-danger" id="clearDataBtn"><i class="fa-solid fa-trash me-1"></i> Limpiar datos locales</button>
+            <div class="small text-muted mt-2">Esto eliminará todos los datos almacenados localmente, incluyendo pedidos en curso.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-primary" id="saveSettingsBtn">Guardar Configuración</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Toast -->
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -732,10 +863,17 @@
     const cartModalEl = document.getElementById('cartModal');
     const cartModal = new bootstrap.Modal(cartModalEl, { keyboard: true, focus: true });
     const historyModal = new bootstrap.Modal(document.getElementById('orderHistoryModal'), { keyboard:true });
+    const settingsModal = new bootstrap.Modal(document.getElementById('settingsModal'), { keyboard: true, focus: true });
     const liveToast = new bootstrap.Toast(document.getElementById('liveToast'));
     const toastBody = document.getElementById('toast-body-content');
     const toastIcon = document.getElementById('toastIcon');
     const suggestionsContainer = document.getElementById('search-suggestions');
+    const openSettingsBtn = document.getElementById('openSettingsBtn');
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    const themeOptions = document.querySelectorAll('.theme-option');
+    const fontSizeBtns = document.querySelectorAll('.font-size-btn');
+    const notificationsSwitch = document.getElementById('notificationsSwitch');
+    const clearDataBtn = document.getElementById('clearDataBtn');
     /* -------------------------
        Utilidades
        ------------------------- */
@@ -1184,6 +1322,73 @@
     });
     document.getElementById('exportBtn').addEventListener('click', exportToExcel);
     /* -------------------------
+       Settings modal functionality
+       ------------------------- */
+    openSettingsBtn.addEventListener('click', () => {
+      settingsModal.show();
+    });
+    // Theme selection
+    themeOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        themeOptions.forEach(opt => opt.classList.remove('active'));
+        option.classList.add('active');
+        const theme = option.dataset.theme;
+        if (theme === 'dark') {
+          document.body.classList.add('dark-mode');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          document.body.classList.remove('dark-mode');
+          localStorage.setItem('theme', 'light');
+        }
+      });
+    });
+    // Font size selection
+    fontSizeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        fontSizeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const size = btn.dataset.size;
+        let fontSize;
+        switch(size) {
+          case 'small':
+            fontSize = '1rem';
+            break;
+          case 'medium':
+            fontSize = '1.1rem';
+            break;
+          case 'large':
+            fontSize = '1.2rem';
+            break;
+          default:
+            fontSize = '1rem';
+        }
+        document.documentElement.style.setProperty('--font-size', fontSize);
+        localStorage.setItem('fontSize', size);
+      });
+    });
+    // Notifications switch
+    notificationsSwitch.addEventListener('change', () => {
+      const isChecked = notificationsSwitch.checked;
+      localStorage.setItem('notifications', isChecked);
+      showToast(`Notificaciones ${isChecked ? 'activadas' : 'desactivadas'}`, 'success');
+    });
+    // Clear data button
+    clearDataBtn.addEventListener('click', () => {
+      if (confirm('¿Estás seguro de que deseas eliminar todos los datos locales? Esta acción no se puede deshacer.')) {
+        localStorage.clear();
+        showToast('Datos locales eliminados', 'success');
+        // Recargar la página para aplicar cambios
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    });
+    // Save settings button
+    saveSettingsBtn.addEventListener('click', () => {
+      showToast('Configuración guardada', 'success');
+      settingsModal.hide();
+    });
+    /* -------------------------
        Firestore realtime listener (orders)
        ------------------------- */
     onSnapshot(collection(db,'orders'), (snap)=>{
@@ -1231,6 +1436,43 @@
        Inicialización
        ------------------------- */
     (function init(){
+      // Cargar configuración guardada
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        const darkOption = document.querySelector('.theme-option[data-theme="dark"]');
+        if (darkOption) {
+          darkOption.classList.add('active');
+          document.querySelector('.theme-option[data-theme="light"]').classList.remove('active');
+        }
+      }
+      const savedFontSize = localStorage.getItem('fontSize');
+      if (savedFontSize) {
+        const btn = document.querySelector(`.font-size-btn[data-size="${savedFontSize}"]`);
+        if (btn) {
+          fontSizeBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          let fontSize;
+          switch(savedFontSize) {
+            case 'small':
+              fontSize = '1rem';
+              break;
+            case 'medium':
+              fontSize = '1.1rem';
+              break;
+            case 'large':
+              fontSize = '1.2rem';
+              break;
+            default:
+              fontSize = '1rem';
+          }
+          document.documentElement.style.setProperty('--font-size', fontSize);
+        }
+      }
+      const savedNotifications = localStorage.getItem('notifications');
+      if (savedNotifications !== null) {
+        notificationsSwitch.checked = savedNotifications === 'true';
+      }
       localLoadOrder();
       renderProducts('', 'all');
       renderCurrentOrder();
