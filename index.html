@@ -158,6 +158,16 @@
       transform: translateY(-1px);
     }
 
+    .filters-toggle-btn {
+      display: none;
+    }
+
+    @media (max-width: 575.98px) {
+      .filters-toggle-btn {
+        display: inline-flex;
+      }
+    }
+
     /* ===== PRODUCT LIST (Refined Cards) ===== */
     .view-toggle { display: flex; justify-content: flex-end; margin-bottom: 10px; }
 
@@ -464,20 +474,33 @@
   <main class="main-container">
     
     <!-- Stats Section (Horizontal Scroll) -->
-    <section id="statsSection" class="stats-scroll-container">
-      <div class="stat-card-modern">
-        <span class="stat-value" id="statTotalOrders">0</span>
-        <span class="stat-label">Pedidos Hoy</span>
+    <div class="accordion mb-3" id="statsAccordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="statsHeading">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#statsCollapse" aria-expanded="true" aria-controls="statsCollapse">
+            Resumen
+          </button>
+        </h2>
+        <div id="statsCollapse" class="accordion-collapse collapse show" aria-labelledby="statsHeading" data-bs-parent="#statsAccordion">
+          <div class="accordion-body">
+            <section id="statsSection" class="stats-scroll-container">
+              <div class="stat-card-modern">
+                <span class="stat-value" id="statTotalOrders">0</span>
+                <span class="stat-label">Pedidos Hoy</span>
+              </div>
+              <div class="stat-card-modern" style="border-left-color: var(--success);">
+                <span class="stat-value" id="statTotalSales">$0</span>
+                <span class="stat-label">Ventas</span>
+              </div>
+              <div class="stat-card-modern" style="border-left-color: var(--warning);">
+                <span class="stat-value" id="statPending">0</span>
+                <span class="stat-label">Pendientes</span>
+              </div>
+            </section>
+          </div>
+        </div>
       </div>
-      <div class="stat-card-modern" style="border-left-color: var(--success);">
-        <span class="stat-value" id="statTotalSales">$0</span>
-        <span class="stat-label">Ventas</span>
-      </div>
-       <div class="stat-card-modern" style="border-left-color: var(--warning);">
-        <span class="stat-value" id="statPending">0</span>
-        <span class="stat-label">Pendientes</span>
-      </div>
-    </section>
+    </div>
 
     <!-- Create Order Form -->
     <section class="card-box" id="clientFormSection">
@@ -507,22 +530,35 @@
 
     <!-- Filters & Search -->
     <section id="catalogSection">
-      <div class="d-flex gap-2 mb-3 align-items-center">
-         <div class="flex-grow-1 position-relative">
-            <i class="fa-solid fa-search text-secondary position-absolute top-50 start-0 translate-middle-y ms-3"></i>
-            <input type="text" id="searchInput" class="form-control ps-5" placeholder="Buscar producto...">
-         </div>
-         <button class="btn btn-light shadow-sm" style="border-radius:12px; height:46px; width:46px;" onclick="toggleView()" id="viewToggleBtn"><i class="fa-solid fa-list"></i></button>
-      </div>
-      
-      <div class="filter-scroll" id="categoryFilters">
-        <button class="filter-chip active" data-cat="all">Todos</button>
-        <button class="filter-chip" data-cat="favorites"><i class="fa-solid fa-star text-warning me-1"></i> Favoritos</button>
-        <button class="filter-chip" data-cat="respiratory">Respiratorio</button>
-        <button class="filter-chip" data-cat="gastrointestinal">Digestivo</button>
-        <button class="filter-chip" data-cat="analgesic">Dolor</button>
-        <button class="filter-chip" data-cat="topical">Tópicos</button>
-        <button class="filter-chip" data-cat="gynecological">Ginecológico</button>
+      <div class="accordion mb-3" id="filtersAccordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="filtersHeading">
+            <button class="accordion-button filters-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse" aria-expanded="true" aria-controls="filtersCollapse">
+              Mostrar filtros
+            </button>
+          </h2>
+          <div id="filtersCollapse" class="accordion-collapse collapse show" aria-labelledby="filtersHeading" data-bs-parent="#filtersAccordion">
+            <div class="accordion-body">
+              <div class="d-flex gap-2 mb-3 align-items-center">
+                <div class="flex-grow-1 position-relative">
+                  <i class="fa-solid fa-search text-secondary position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                  <input type="text" id="searchInput" class="form-control ps-5" placeholder="Buscar producto...">
+                </div>
+                <button class="btn btn-light shadow-sm" style="border-radius:12px; height:46px; width:46px;" onclick="toggleView()" id="viewToggleBtn"><i class="fa-solid fa-list"></i></button>
+              </div>
+              
+              <div class="filter-scroll" id="categoryFilters">
+                <button class="filter-chip active" data-cat="all">Todos</button>
+                <button class="filter-chip" data-cat="favorites"><i class="fa-solid fa-star text-warning me-1"></i> Favoritos</button>
+                <button class="filter-chip" data-cat="respiratory">Respiratorio</button>
+                <button class="filter-chip" data-cat="gastrointestinal">Digestivo</button>
+                <button class="filter-chip" data-cat="analgesic">Dolor</button>
+                <button class="filter-chip" data-cat="topical">Tópicos</button>
+                <button class="filter-chip" data-cat="gynecological">Ginecológico</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
