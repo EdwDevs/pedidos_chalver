@@ -442,11 +442,58 @@
     
     /* History Cards */
     .history-card {
-      position: relative; overflow: hidden; border-left: 4px solid transparent;
+      position: relative;
+      overflow: hidden;
+      border-left: 4px solid transparent;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: var(--bg-card);
     }
     .history-card::before {
       content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--primary);
       border-radius: 4px 0 0 4px;
+    }
+
+    .history-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .history-actions-inline .btn,
+    .history-actions-menu .btn {
+      padding: 0.6rem 1.1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 12px;
+      min-height: 44px;
+    }
+
+    .history-actions-inline .btn {
+      box-shadow: var(--shadow-sm);
+    }
+
+    .history-actions-menu {
+      display: none;
+    }
+
+    .history-actions-menu .dropdown-menu {
+      border-radius: 14px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .history-actions-menu .dropdown-item {
+      padding: 0.65rem 1rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 575.98px) {
+      .history-actions-inline {
+        display: none;
+      }
+
+      .history-actions-menu {
+        display: flex;
+      }
     }
     
     /* Animation Classes */
@@ -1279,10 +1326,22 @@
                    ${itemsPreviewHtml}
                  </div>
                  
-                 <div class="history-actions">
-                  <button class="btn btn-sm btn-outline-primary" onclick="editOrder('${o.id}')"><i class="fa-solid fa-pen me-1"></i>Editar</button>
-                  <button class="btn btn-sm btn-outline-secondary" onclick="repeatOrder('${o.id}')"><i class="fa-solid fa-clone me-1"></i>Repetir</button>
-                  <button class="btn btn-sm btn-outline-danger" onclick="deleteOrder('${o.id}')"><i class="fa-solid fa-trash"></i></button>
+                 <div class="history-actions history-actions-inline">
+                  <button class="btn btn-outline-primary" onclick="editOrder('${o.id}')"><i class="fa-solid fa-pen me-1"></i>Editar</button>
+                  <button class="btn btn-outline-secondary" onclick="repeatOrder('${o.id}')"><i class="fa-solid fa-clone me-1"></i>Repetir</button>
+                  <button class="btn btn-outline-danger" onclick="deleteOrder('${o.id}')"><i class="fa-solid fa-trash me-1"></i>Eliminar</button>
+                 </div>
+                 <div class="history-actions history-actions-menu">
+                  <div class="dropdown w-100">
+                    <button class="btn btn-outline-primary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="fa-solid fa-ellipsis-vertical me-2"></i>Acciones
+                    </button>
+                    <ul class="dropdown-menu w-100">
+                      <li><button class="dropdown-item" type="button" onclick="editOrder('${o.id}')"><i class="fa-solid fa-pen me-2 text-primary"></i>Editar</button></li>
+                      <li><button class="dropdown-item" type="button" onclick="repeatOrder('${o.id}')"><i class="fa-solid fa-clone me-2 text-secondary"></i>Repetir</button></li>
+                      <li><button class="dropdown-item text-danger" type="button" onclick="deleteOrder('${o.id}')"><i class="fa-solid fa-trash me-2"></i>Eliminar</button></li>
+                    </ul>
+                  </div>
                  </div>
               </div>
             </div>
