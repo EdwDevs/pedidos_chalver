@@ -38,6 +38,7 @@
       
       --header-height: 60px;
       --bottom-nav-height: 76px;
+      --bottom-sheet-height: 72px;
     }
 
     /* Dark Mode Tweaks */
@@ -58,7 +59,7 @@
       background-color: var(--bg-body);
       color: var(--dark);
       margin: 0;
-      padding-bottom: calc(var(--bottom-nav-height) + 20px);
+      padding-bottom: calc(var(--bottom-nav-height) + var(--bottom-sheet-height) + 40px);
       height: 100vh;
       overflow-y: auto;
       scroll-behavior: smooth;
@@ -307,6 +308,72 @@
       border: 2px solid var(--bg-body);
     }
 
+    /* Bottom Sheet (Cart Summary) */
+    .cart-sheet {
+      position: fixed;
+      bottom: calc(var(--bottom-nav-height) + 26px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 92%;
+      max-width: 440px;
+      background: var(--bg-card);
+      border-radius: 18px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 0.7rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 1050;
+      cursor: pointer;
+    }
+
+    .cart-sheet-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .cart-sheet-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    .cart-sheet-total {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--dark);
+    }
+
+    .cart-sheet-qty {
+      font-size: 0.85rem;
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    .cart-sheet-action {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 0.55rem 0.9rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    body.dark-mode .cart-sheet {
+      border-color: rgba(255, 255, 255, 0.08);
+      background: rgba(30, 41, 59, 0.95);
+    }
+
     /* ===== INPUTS ===== */
     .form-control, .form-select {
       background-color: var(--bg-body); color: var(--dark);
@@ -438,6 +505,19 @@
     <i class="fa-solid fa-cart-shopping"></i>
     <div class="cart-badge" id="cartBadge" style="display:none;">0</div>
   </button>
+
+  <!-- Bottom Sheet Cart Summary -->
+  <div class="cart-sheet" onclick="openCart()" role="button" aria-label="Abrir carrito">
+    <div class="cart-sheet-info">
+      <span class="cart-sheet-title">Carrito</span>
+      <span class="cart-sheet-total" id="cartSheetTotal">$0</span>
+      <span class="cart-sheet-qty" id="cartSheetQty">0 items</span>
+    </div>
+    <button class="cart-sheet-action" type="button">
+      Ver carrito
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+  </div>
 
   <!-- Bottom Nav (Floating Style) -->
   <nav class="bottom-nav">
@@ -626,6 +706,8 @@
     // --- DOM ELEMENTS ---
     const productContainer = document.getElementById('productsContainer');
     const cartBadge = document.getElementById('cartBadge');
+    const cartSheetTotal = document.getElementById('cartSheetTotal');
+    const cartSheetQty = document.getElementById('cartSheetQty');
     const toastContainer = document.getElementById('toastContainer');
 
     const toastVariants = {
@@ -665,6 +747,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       renderProducts();
       loadOrders();
+      updateCartUI();
       
       // Check Theme
       if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
@@ -768,8 +851,11 @@
 
     function updateCartUI() {
       const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+      const totalAmount = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
       cartBadge.textContent = totalItems;
       cartBadge.style.display = totalItems > 0 ? 'flex' : 'none';
+      cartSheetTotal.textContent = formatCOP(totalAmount);
+      cartSheetQty.textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'items'}`;
     }
 
     window.toggleFav = (id) => {
