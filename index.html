@@ -510,6 +510,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Toasts -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" style="z-index: 2000;"></div>
   
   <!-- Scripts Loaders -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -623,6 +626,40 @@
     // --- DOM ELEMENTS ---
     const productContainer = document.getElementById('productsContainer');
     const cartBadge = document.getElementById('cartBadge');
+    const toastContainer = document.getElementById('toastContainer');
+
+    const toastVariants = {
+      success: { className: 'text-bg-success', icon: 'fa-circle-check', title: 'Éxito' },
+      warning: { className: 'text-bg-warning text-dark', icon: 'fa-triangle-exclamation', title: 'Atención' },
+      error: { className: 'text-bg-danger', icon: 'fa-circle-xmark', title: 'Error' }
+    };
+
+    function showToast(variant, message, options = {}) {
+      const config = toastVariants[variant] || toastVariants.success;
+      const delay = options.delay ?? 3200;
+      const toast = document.createElement('div');
+      toast.className = `toast align-items-center border-0 shadow-sm ${config.className}`;
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      toast.setAttribute('aria-atomic', 'true');
+      const closeClass = variant === 'warning' ? '' : 'btn-close-white';
+      toast.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body d-flex align-items-center gap-2">
+            <i class="fa-solid ${config.icon}"></i>
+            <div>
+              <div class="fw-semibold">${config.title}</div>
+              <div class="small">${message}</div>
+            </div>
+          </div>
+          <button type="button" class="btn-close ${closeClass} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      `;
+      toastContainer.appendChild(toast);
+      const toastInstance = new window.bootstrap.Toast(toast, { delay, autohide: true });
+      toast.addEventListener('hidden.bs.toast', () => toast.remove());
+      toastInstance.show();
+    }
     
     // --- INIT ---
     window.addEventListener('DOMContentLoaded', () => {
@@ -844,6 +881,7 @@
         renderProducts();
         if (cartModalInstance) cartModalInstance.hide();
         cancelEdit();
+        showToast('success', 'Carrito vaciado correctamente.');
       }
     };
 
@@ -883,7 +921,7 @@
 
     // --- FIREBASE ORDERS ---
     window.saveOrder = async () => {
-      if(cart.length === 0) return alert("Carrito vacío");
+      if(cart.length === 0) return showToast('warning', 'El carrito está vacío.');
       
       const defaults = getClientAndSupplierDefaults();
       const clientInput = document.getElementById('clientName').value.trim();
@@ -891,8 +929,8 @@
       const client = clientInput || defaults.client;
       const supplier = supplierInput || defaults.supplier;
 
-      if(clientInput.length < 2) return alert("Ingresa un nombre de cliente válido (mínimo 2 caracteres)");
-      if(!supplierInput) return alert("Selecciona un depósito válido");
+      if(clientInput.length < 2) return showToast('warning', 'Ingresa un nombre de cliente válido (mínimo 2 caracteres).');
+      if(!supplierInput) return showToast('warning', 'Selecciona un depósito válido.');
 
       const normalizedItems = cart.map(item => ({
         ...item,
@@ -900,7 +938,7 @@
         price: Number(item.price)
       })).filter(item => item.qty > 0 && item.price > 0);
 
-      if(normalizedItems.length === 0) return alert("Agrega al menos un ítem con cantidad y precio válidos");
+      if(normalizedItems.length === 0) return showToast('warning', 'Agrega al menos un ítem con cantidad y precio válidos.');
 
       const total = normalizedItems.reduce((acc, i) => acc + (i.price * i.qty), 0);
       
@@ -916,10 +954,10 @@
       try {
         if(editingOrderId) {
            await updateDoc(doc(db, "orders", editingOrderId), orderData);
-           alert("Pedido Actualizado");
+           showToast('success', 'Pedido actualizado correctamente.');
         } else {
            await addDoc(collection(db, "orders"), orderData);
-           alert("Pedido Guardado");
+           showToast('success', 'Pedido guardado correctamente.');
         }
         
         cart = [];
@@ -928,7 +966,7 @@
         renderProducts();
         if (cartModalInstance) cartModalInstance.hide();
       } catch (e) {
-        alert("Error guardando: " + e.message);
+        showToast('error', `Error guardando: ${e.message}`);
       }
     };
 
@@ -1092,7 +1130,7 @@
        renderProducts();
        if (historyModalInstance) historyModalInstance.hide();
        window.scrollTo({ top: 0, behavior: 'smooth' });
-       alert(`Editando pedido de ${order.clientName || order.client}`);
+       showToast('warning', `Editando pedido de ${order.clientName || order.client}.`);
     };
 
     window.repeatOrder = (id) => {
@@ -1113,6 +1151,7 @@
     window.deleteOrder = async (id) => {
       if(confirm("¿Estás seguro de eliminar este pedido del historial?")) {
         await deleteDoc(doc(db, "orders", id));
+        showToast('success', 'Pedido eliminado del historial.');
       }
     };
 
