@@ -451,6 +451,7 @@
       <div class="row g-3">
         <div class="col-12">
           <input type="text" id="clientName" class="form-control" placeholder="Nombre Droguería / Cliente">
+          <div id="clientNameFeedback" class="form-text text-muted" data-default="Mínimo 2 caracteres.">Mínimo 2 caracteres.</div>
         </div>
         <div class="col-12">
           <select id="supplierSelect" class="form-select">
@@ -459,6 +460,7 @@
             <option value="UNIDROGAS">UNIDROGAS</option>
             <option value="ETICO">ETICO</option>
           </select>
+          <div id="supplierFeedback" class="form-text text-muted" data-default="Selecciona un depósito.">Selecciona un depósito.</div>
         </div>
       </div>
       <div id="editControls" class="d-none mt-3 text-end">
@@ -971,11 +973,38 @@
       }
     };
 
+    const setFieldFeedback = (inputId, feedbackId, isValid, message) => {
+      const input = document.getElementById(inputId);
+      const feedback = document.getElementById(feedbackId);
+      if(!input || !feedback) return;
+
+      input.classList.toggle('is-valid', isValid);
+      input.classList.toggle('is-invalid', !isValid);
+
+      feedback.textContent = message;
+      feedback.classList.remove('text-muted', 'text-success', 'text-danger');
+      feedback.classList.add(isValid ? 'text-success' : 'text-danger');
+    };
+
+    const resetFieldFeedback = (inputId, feedbackId) => {
+      const input = document.getElementById(inputId);
+      const feedback = document.getElementById(feedbackId);
+      if(!input || !feedback) return;
+
+      input.classList.remove('is-valid', 'is-invalid');
+      feedback.textContent = feedback.dataset.default || '';
+      feedback.classList.remove('text-success', 'text-danger');
+      feedback.classList.add('text-muted');
+    };
+
     window.cancelEdit = () => {
        editingOrderId = null;
        document.getElementById('modeBadge').classList.add('d-none');
        document.getElementById('editControls').classList.add('d-none');
        document.getElementById('clientName').value = '';
+       document.getElementById('supplierSelect').value = '';
+       resetFieldFeedback('clientName', 'clientNameFeedback');
+       resetFieldFeedback('supplierSelect', 'supplierFeedback');
     }
 
     // --- WHATSAPP INTEGRATION ---
@@ -1015,8 +1044,24 @@
       const client = clientInput || defaults.client;
       const supplier = supplierInput || defaults.supplier;
 
-      if(clientInput.length < 2) return showToast('warning', 'Ingresa un nombre de cliente válido (mínimo 2 caracteres).');
-      if(!supplierInput) return showToast('warning', 'Selecciona un depósito válido.');
+      const clientValid = clientInput.length >= 2;
+      const supplierValid = Boolean(supplierInput);
+
+      setFieldFeedback(
+        'clientName',
+        'clientNameFeedback',
+        clientValid,
+        clientValid ? 'Cliente válido.' : 'Ingresa un nombre válido (mínimo 2 caracteres).'
+      );
+      setFieldFeedback(
+        'supplierSelect',
+        'supplierFeedback',
+        supplierValid,
+        supplierValid ? 'Depósito seleccionado correctamente.' : 'Selecciona un depósito válido.'
+      );
+
+      if(!clientValid) return showToast('warning', 'Ingresa un nombre de cliente válido (mínimo 2 caracteres).');
+      if(!supplierValid) return showToast('warning', 'Selecciona un depósito válido.');
 
       const normalizedItems = cart.map(item => ({
         ...item,
