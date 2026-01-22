@@ -868,15 +868,26 @@
     window.saveOrder = async () => {
       if(cart.length === 0) return alert("Carrito vacío");
       
-      const client = document.getElementById('clientName').value;
-      if(!client) return alert("Ingresa nombre del cliente");
-      
-      const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+      const client = document.getElementById('clientName').value.trim();
+      if(client.length < 2) return alert("Ingresa un nombre de cliente válido (mínimo 2 caracteres)");
+
+      const supplier = document.getElementById('supplierSelect').value;
+      if(!supplier) return alert("Selecciona un depósito válido");
+
+      const normalizedItems = cart.map(item => ({
+        ...item,
+        qty: Number(item.qty),
+        price: Number(item.price)
+      })).filter(item => item.qty > 0 && item.price > 0);
+
+      if(normalizedItems.length === 0) return alert("Agrega al menos un ítem con cantidad y precio válidos");
+
+      const total = normalizedItems.reduce((acc, i) => acc + (i.price * i.qty), 0);
       
       const orderData = {
         clientName: client, 
-        supplier: document.getElementById('supplierSelect').value,
-        items: cart,
+        supplier: supplier,
+        items: normalizedItems,
         total: total,
         date: serverTimestamp()
       };
