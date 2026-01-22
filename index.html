@@ -542,6 +542,11 @@
         }).format(val);
     };
 
+    const getClientAndSupplierDefaults = () => ({
+      client: 'Cliente General',
+      supplier: 'Sin asignar'
+    });
+
     // --- DATA (CATALOGO COMPLETO RESTAURADO) ---
     const products = [
       { id: 1, ref: 'AIRMAX HFC 200DS (1+1)', name: 'AIRMAX AEROSOL HFC X 200DOSIS (1+1)', principle: 'SALBUTAMOL', price: 27609.12, category: 'respiratory' },
@@ -800,8 +805,9 @@
         cartModalInstance = new window.bootstrap.Modal(document.getElementById('cartModal'));
       }
 
-      const client = document.getElementById('clientName').value || 'Cliente General';
-      const supplier = document.getElementById('supplierSelect').value || 'Sin asignar';
+      const defaults = getClientAndSupplierDefaults();
+      const client = document.getElementById('clientName').value.trim() || defaults.client;
+      const supplier = document.getElementById('supplierSelect').value || defaults.supplier;
       
       document.getElementById('cartClient').textContent = client;
       document.getElementById('cartSupplier').textContent = supplier;
@@ -852,8 +858,9 @@
     window.sendToWhatsApp = () => {
       if(cart.length === 0) return;
       
-      const client = document.getElementById('clientName').value || 'Sin Nombre';
-      const supplier = document.getElementById('supplierSelect').value || 'General';
+      const defaults = getClientAndSupplierDefaults();
+      const client = document.getElementById('clientName').value.trim() || defaults.client;
+      const supplier = document.getElementById('supplierSelect').value || defaults.supplier;
       let total = 0;
       
       let message = `*PEDIDO NUEVO*\n`;
@@ -878,11 +885,14 @@
     window.saveOrder = async () => {
       if(cart.length === 0) return alert("Carrito vacío");
       
-      const client = document.getElementById('clientName').value.trim();
-      if(client.length < 2) return alert("Ingresa un nombre de cliente válido (mínimo 2 caracteres)");
+      const defaults = getClientAndSupplierDefaults();
+      const clientInput = document.getElementById('clientName').value.trim();
+      const supplierInput = document.getElementById('supplierSelect').value;
+      const client = clientInput || defaults.client;
+      const supplier = supplierInput || defaults.supplier;
 
-      const supplier = document.getElementById('supplierSelect').value;
-      if(!supplier) return alert("Selecciona un depósito válido");
+      if(clientInput.length < 2) return alert("Ingresa un nombre de cliente válido (mínimo 2 caracteres)");
+      if(!supplierInput) return alert("Selecciona un depósito válido");
 
       const normalizedItems = cart.map(item => ({
         ...item,
