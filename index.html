@@ -65,6 +65,42 @@
       scroll-behavior: smooth;
     }
 
+    body.font-large {
+      font-size: 18px;
+    }
+
+    body.high-contrast {
+      --bg-body: #000000;
+      --bg-card: #0f172a;
+      --dark: #ffffff;
+      --secondary: #e2e8f0;
+      --primary: #facc15;
+      --primary-soft: #111827;
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.6);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    .settings-section {
+      padding: 0.75rem;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 12px;
+      background: var(--bg-card);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 0.75rem;
+    }
+
+    .settings-section h6 {
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
+
+    .status-pill {
+      font-size: 0.75rem;
+      padding: 0.35rem 0.6rem;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
     /* ===== HEADER (Clean & Minimal) ===== */
     .app-header {
       background: var(--bg-card);
@@ -799,7 +835,99 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <p class="text-muted">Opciones de personalización próximamente...</p>
+          <div class="settings-section">
+            <h6><i class="fa-solid fa-sliders me-2 text-primary"></i>Preferencias</h6>
+            <div class="mb-3">
+              <label for="themeSelect" class="form-label">Tema</label>
+              <select id="themeSelect" class="form-select">
+                <option value="light">Claro</option>
+                <option value="dark">Oscuro</option>
+                <option value="auto">Automático</option>
+              </select>
+            </div>
+            <div class="row g-3">
+              <div class="col-6">
+                <label for="defaultViewSelect" class="form-label">Vista predeterminada</label>
+                <select id="defaultViewSelect" class="form-select">
+                  <option value="grid">Grid</option>
+                  <option value="table">Tabla</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label for="sortSelect" class="form-label">Orden de productos</label>
+                <select id="sortSelect" class="form-select">
+                  <option value="name-asc">Nombre A → Z</option>
+                  <option value="name-desc">Nombre Z → A</option>
+                  <option value="price-asc">Precio menor → mayor</option>
+                  <option value="price-desc">Precio mayor → menor</option>
+                </select>
+              </div>
+            </div>
+            <div class="mt-3">
+              <label for="defaultCategorySelect" class="form-label">Filtro por defecto</label>
+              <select id="defaultCategorySelect" class="form-select">
+                <option value="all">Todos</option>
+                <option value="favorites">Favoritos</option>
+                <option value="respiratory">Respiratorio</option>
+                <option value="gastrointestinal">Digestivo</option>
+                <option value="analgesic">Dolor</option>
+                <option value="topical">Tópicos</option>
+                <option value="gynecological">Ginecológico</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h6><i class="fa-solid fa-warehouse me-2 text-primary"></i>Depósito por defecto</h6>
+            <label for="defaultSupplierSelect" class="form-label">Depósito preferido</label>
+            <select id="defaultSupplierSelect" class="form-select">
+              <option value="">Sin asignar</option>
+              <option value="DROSAN">DROSAN</option>
+              <option value="UNIDROGAS">UNIDROGAS</option>
+              <option value="ETICO">ETICO</option>
+            </select>
+          </div>
+
+          <div class="settings-section">
+            <h6><i class="fa-solid fa-universal-access me-2 text-primary"></i>Accesibilidad</h6>
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" id="fontSizeToggle">
+              <label class="form-check-label" for="fontSizeToggle">Tamaño de fuente grande</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="contrastToggle">
+              <label class="form-check-label" for="contrastToggle">Alto contraste</label>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h6><i class="fa-solid fa-desktop me-2 text-primary"></i>Gestión local</h6>
+            <div class="d-grid gap-2">
+              <button class="btn btn-outline-warning" type="button" id="clearFavoritesBtn"><i class="fa-solid fa-star me-2"></i>Borrar favoritos</button>
+              <button class="btn btn-outline-danger" type="button" id="clearCartBtn"><i class="fa-solid fa-trash me-2"></i>Vaciar carrito</button>
+              <button class="btn btn-outline-secondary" type="button" id="resetFiltersBtn"><i class="fa-solid fa-filter-circle-xmark me-2"></i>Resetear búsqueda y filtros</button>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h6><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Historial</h6>
+            <div class="d-grid gap-2">
+              <button class="btn btn-outline-primary" type="button" id="exportCsvBtn"><i class="fa-solid fa-file-csv me-2"></i>Exportar CSV</button>
+              <button class="btn btn-outline-danger" type="button" id="clearHistoryBtn"><i class="fa-solid fa-trash-can me-2"></i>Borrar historial</button>
+            </div>
+          </div>
+
+          <div class="settings-section mb-0">
+            <h6><i class="fa-solid fa-circle-info me-2 text-primary"></i>Información</h6>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">Versión</span>
+              <span class="badge bg-light text-dark">v1.0.0</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <span class="text-muted">Estado de conexión</span>
+              <span id="connectionStatus" class="status-pill bg-secondary text-white">Verificando...</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -813,7 +941,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, doc, updateDoc, deleteDoc, getDocs, query, limit } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
     // --- CONFIG ---
     const firebaseConfig = {
@@ -839,9 +967,11 @@
         }).format(val);
     };
 
+    const getDefaultSupplierFromStorage = () => localStorage.getItem('defaultSupplier') || '';
+
     const getClientAndSupplierDefaults = () => ({
       client: 'Cliente General',
-      supplier: 'Sin asignar'
+      supplier: getDefaultSupplierFromStorage() || 'Sin asignar'
     });
 
     // --- DATA (CATALOGO COMPLETO RESTAURADO) ---
@@ -910,6 +1040,9 @@
     let favorites = JSON.parse(localStorage.getItem('favs') || '[]');
     let currentView = 'grid'; 
     let activeCategory = 'all';
+    let currentSort = 'name-asc';
+    let themePreference = 'auto';
+    let connectionIntervalId = null;
     let editingOrderId = null;
     
     // Modal Instances (Lazy)
@@ -957,6 +1090,152 @@
       toastInstance.show();
     }
 
+    const preferenceKeys = {
+      theme: 'themePreference',
+      view: 'preferredView',
+      category: 'preferredCategory',
+      sort: 'productSort',
+      supplier: 'defaultSupplier',
+      fontSize: 'fontSize',
+      contrast: 'highContrast'
+    };
+
+    const getStoredPreference = (key, fallback) => {
+      const value = localStorage.getItem(key);
+      return value !== null ? value : fallback;
+    };
+
+    const updateViewToggleButton = () => {
+      const viewToggle = document.getElementById('viewToggleBtn');
+      if (!viewToggle) return;
+      viewToggle.innerHTML = currentView === 'grid' ? '<i class="fa-solid fa-list"></i>' : '<i class="fa-solid fa-border-all"></i>';
+    };
+
+    const applyCategoryUI = () => {
+      document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+      const activeChip = document.querySelector(`.filter-chip[data-cat="${activeCategory}"]`) || document.querySelector('.filter-chip[data-cat="all"]');
+      if (activeChip) activeChip.classList.add('active');
+    };
+
+    const applyDefaultSupplier = () => {
+      const supplierSelect = document.getElementById('supplierSelect');
+      if (!supplierSelect) return;
+      const defaultSupplier = getDefaultSupplierFromStorage();
+      if (editingOrderId) return;
+      if (defaultSupplier) {
+        supplierSelect.value = defaultSupplier;
+      } else if (!editingOrderId) {
+        supplierSelect.value = '';
+      }
+    };
+
+    const setThemePreference = (preference) => {
+      themePreference = preference;
+      localStorage.setItem(preferenceKeys.theme, preference);
+      applyThemePreference(preference);
+      updateThemeToggleIcon();
+      const themeSelect = document.getElementById('themeSelect');
+      if (themeSelect) themeSelect.value = preference;
+    };
+
+    const applyThemePreference = (preference) => {
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const shouldUseDark = preference === 'dark' || (preference === 'auto' && prefersDark);
+      document.body.classList.toggle('dark-mode', shouldUseDark);
+    };
+
+    const updateThemeToggleIcon = () => {
+      const themeToggle = document.getElementById('toggleThemeBtn');
+      if (!themeToggle) return;
+      const iconClass = document.body.classList.contains('dark-mode') ? 'fa-sun' : 'fa-moon';
+      themeToggle.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+    };
+
+    const applyAccessibilityPreferences = () => {
+      const fontSize = getStoredPreference(preferenceKeys.fontSize, 'normal');
+      const highContrast = getStoredPreference(preferenceKeys.contrast, 'false') === 'true';
+
+      document.body.classList.toggle('font-large', fontSize === 'large');
+      document.body.classList.toggle('high-contrast', highContrast);
+
+      const fontToggle = document.getElementById('fontSizeToggle');
+      if (fontToggle) fontToggle.checked = fontSize === 'large';
+      const contrastToggle = document.getElementById('contrastToggle');
+      if (contrastToggle) contrastToggle.checked = highContrast;
+    };
+
+    const applyViewPreference = (view) => {
+      currentView = view;
+      updateViewToggleButton();
+    };
+
+    const applySortPreference = (sortValue) => {
+      const validSorts = ['name-asc', 'name-desc', 'price-asc', 'price-desc'];
+      currentSort = validSorts.includes(sortValue) ? sortValue : 'name-asc';
+      const sortSelect = document.getElementById('sortSelect');
+      if (sortSelect) sortSelect.value = currentSort;
+    };
+
+    const applyCategoryPreference = (category) => {
+      const validCategories = ['all', 'favorites', 'respiratory', 'gastrointestinal', 'analgesic', 'topical', 'gynecological'];
+      activeCategory = validCategories.includes(category) ? category : 'all';
+      applyCategoryUI();
+      const categorySelect = document.getElementById('defaultCategorySelect');
+      if (categorySelect) categorySelect.value = activeCategory;
+    };
+
+    const applySupplierPreference = () => {
+      const defaultSupplierSelect = document.getElementById('defaultSupplierSelect');
+      if (defaultSupplierSelect) {
+        defaultSupplierSelect.value = getDefaultSupplierFromStorage();
+      }
+      applyDefaultSupplier();
+    };
+
+    const updateSettingsForm = () => {
+      const themeSelect = document.getElementById('themeSelect');
+      if (themeSelect) themeSelect.value = themePreference;
+      const viewSelect = document.getElementById('defaultViewSelect');
+      if (viewSelect) viewSelect.value = currentView;
+      const categorySelect = document.getElementById('defaultCategorySelect');
+      if (categorySelect) categorySelect.value = activeCategory;
+      const sortSelect = document.getElementById('sortSelect');
+      if (sortSelect) sortSelect.value = currentSort;
+      const defaultSupplierSelect = document.getElementById('defaultSupplierSelect');
+      if (defaultSupplierSelect) defaultSupplierSelect.value = getDefaultSupplierFromStorage();
+      applyAccessibilityPreferences();
+    };
+
+    const updateConnectionStatus = (state, message) => {
+      const statusEl = document.getElementById('connectionStatus');
+      if (!statusEl) return;
+      statusEl.textContent = message;
+      statusEl.className = `status-pill ${state === 'connected' ? 'bg-success text-white' : 'bg-danger text-white'}`;
+    };
+
+    const pingFirestore = async () => {
+      if (!navigator.onLine) {
+        updateConnectionStatus('disconnected', 'Desconectado');
+        return;
+      }
+      try {
+        await getDocs(query(collection(db, "orders"), limit(1)));
+        updateConnectionStatus('connected', 'Conectado');
+      } catch (error) {
+        updateConnectionStatus('disconnected', 'Desconectado');
+      }
+    };
+
+    const systemThemeMedia = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+    if (systemThemeMedia) {
+      systemThemeMedia.addEventListener('change', () => {
+        if (themePreference === 'auto') {
+          applyThemePreference('auto');
+          updateThemeToggleIcon();
+        }
+      });
+    }
+
     const buildEmptyState = (icon, title, text) => `
       <div class="empty-state">
         <div class="empty-state-icon"><i class="fa-solid ${icon}"></i></div>
@@ -967,12 +1246,24 @@
     
     // --- INIT ---
     window.addEventListener('DOMContentLoaded', () => {
+      const legacyTheme = localStorage.getItem('theme');
+      themePreference = getStoredPreference(preferenceKeys.theme, legacyTheme || 'auto');
+      applyThemePreference(themePreference);
+      updateThemeToggleIcon();
+
+      applyViewPreference(getStoredPreference(preferenceKeys.view, currentView));
+      applyCategoryPreference(getStoredPreference(preferenceKeys.category, activeCategory));
+      applySortPreference(getStoredPreference(preferenceKeys.sort, currentSort));
+      applySupplierPreference();
+      applyAccessibilityPreferences();
+      updateSettingsForm();
+
       renderProducts();
       loadOrders();
       updateCartUI();
-      
-      // Check Theme
-      if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+
+      pingFirestore();
+      connectionIntervalId = window.setInterval(pingFirestore, 30000);
     });
 
     function debounce(fn, wait = 200) {
@@ -996,6 +1287,21 @@
                          p.category === activeCategory;
         return matchSearch && matchCat;
       });
+
+      switch (currentSort) {
+        case 'name-desc':
+          filtered.sort((a, b) => b.name.localeCompare(a.name));
+          break;
+        case 'price-asc':
+          filtered.sort((a, b) => a.price - b.price);
+          break;
+        case 'price-desc':
+          filtered.sort((a, b) => b.price - a.price);
+          break;
+        default:
+          filtered.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+      }
 
       if (currentView === 'grid') {
         productContainer.className = 'product-grid';
@@ -1093,7 +1399,10 @@
 
     window.toggleView = () => {
       currentView = currentView === 'grid' ? 'table' : 'grid';
-      document.getElementById('viewToggleBtn').innerHTML = currentView === 'grid' ? '<i class="fa-solid fa-list"></i>' : '<i class="fa-solid fa-border-all"></i>';
+      localStorage.setItem(preferenceKeys.view, currentView);
+      updateViewToggleButton();
+      const viewSelect = document.getElementById('defaultViewSelect');
+      if (viewSelect) viewSelect.value = currentView;
       renderProducts();
     };
 
@@ -1139,6 +1448,9 @@
         document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
         activeCategory = e.target.dataset.cat;
+        localStorage.setItem(preferenceKeys.category, activeCategory);
+        const categorySelect = document.getElementById('defaultCategorySelect');
+        if (categorySelect) categorySelect.value = activeCategory;
         renderProducts();
       }
     });
@@ -1228,6 +1540,7 @@
        document.getElementById('editControls').classList.add('d-none');
        document.getElementById('clientName').value = '';
        document.getElementById('supplierSelect').value = '';
+       applyDefaultSupplier();
        resetFieldFeedback('clientName', 'clientNameFeedback');
        resetFieldFeedback('supplierSelect', 'supplierFeedback');
     }
@@ -1522,23 +1835,173 @@
     
     window.deleteOrder = async (id) => {
       if(confirm("¿Estás seguro de eliminar este pedido del historial?")) {
-        await deleteDoc(doc(db, "orders", id));
-        showToast('success', 'Pedido eliminado del historial.');
+        try {
+          await deleteDoc(doc(db, "orders", id));
+          showToast('success', 'Pedido eliminado del historial.');
+        } catch (error) {
+          showToast('error', `No se pudo eliminar el pedido: ${error.message}`);
+        }
       }
     };
 
     // --- THEME ---
     document.getElementById('toggleThemeBtn').addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+      const nextPreference = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+      setThemePreference(nextPreference);
+      localStorage.setItem('theme', nextPreference);
     });
     
     window.openSettings = () => {
        if (!settingsModalInstance) {
          settingsModalInstance = new window.bootstrap.Modal(document.getElementById('settingsModal'));
        }
+       updateSettingsForm();
+       pingFirestore();
        settingsModalInstance.show();
     };
+
+    document.getElementById('themeSelect').addEventListener('change', (event) => {
+      setThemePreference(event.target.value);
+    });
+
+    document.getElementById('defaultViewSelect').addEventListener('change', (event) => {
+      currentView = event.target.value;
+      localStorage.setItem(preferenceKeys.view, currentView);
+      updateViewToggleButton();
+      renderProducts();
+    });
+
+    document.getElementById('defaultCategorySelect').addEventListener('change', (event) => {
+      activeCategory = event.target.value;
+      localStorage.setItem(preferenceKeys.category, activeCategory);
+      applyCategoryUI();
+      renderProducts();
+    });
+
+    document.getElementById('sortSelect').addEventListener('change', (event) => {
+      currentSort = event.target.value;
+      localStorage.setItem(preferenceKeys.sort, currentSort);
+      renderProducts();
+    });
+
+    document.getElementById('defaultSupplierSelect').addEventListener('change', (event) => {
+      localStorage.setItem(preferenceKeys.supplier, event.target.value);
+      applyDefaultSupplier();
+      showToast('success', 'Depósito por defecto actualizado.');
+    });
+
+    document.getElementById('fontSizeToggle').addEventListener('change', (event) => {
+      const value = event.target.checked ? 'large' : 'normal';
+      localStorage.setItem(preferenceKeys.fontSize, value);
+      applyAccessibilityPreferences();
+    });
+
+    document.getElementById('contrastToggle').addEventListener('change', (event) => {
+      localStorage.setItem(preferenceKeys.contrast, event.target.checked ? 'true' : 'false');
+      applyAccessibilityPreferences();
+    });
+
+    document.getElementById('clearFavoritesBtn').addEventListener('click', () => {
+      if (!favorites.length) {
+        showToast('warning', 'No hay favoritos para borrar.');
+        return;
+      }
+      if (confirm('¿Borrar todos los favoritos?')) {
+        favorites = [];
+        localStorage.removeItem('favs');
+        renderProducts();
+        showToast('success', 'Favoritos eliminados.');
+      }
+    });
+
+    document.getElementById('clearCartBtn').addEventListener('click', () => {
+      if (cart.length === 0) {
+        showToast('warning', 'El carrito ya está vacío.');
+        return;
+      }
+      if (confirm('¿Vaciar el carrito actual?')) {
+        cart = [];
+        updateCartUI();
+        renderProducts();
+        cancelEdit();
+        showToast('success', 'Carrito vaciado correctamente.');
+      }
+    });
+
+    document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) searchInput.value = '';
+      activeCategory = getStoredPreference(preferenceKeys.category, 'all');
+      applyCategoryUI();
+      const categorySelect = document.getElementById('defaultCategorySelect');
+      if (categorySelect) categorySelect.value = activeCategory;
+      renderProducts();
+      showToast('success', 'Búsqueda y filtros reiniciados.');
+    });
+
+    const buildCsvRow = (values) => values.map(value => `"${String(value ?? '').replace(/"/g, '""')}"`).join(',');
+
+    document.getElementById('exportCsvBtn').addEventListener('click', () => {
+      if (!ordersList.length) {
+        showToast('warning', 'No hay pedidos para exportar.');
+        return;
+      }
+      const rows = [
+        buildCsvRow(['Fecha', 'Cliente', 'Depósito', 'Total', 'Items'])
+      ];
+
+      ordersList
+        .sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0))
+        .forEach(order => {
+          const dateValue = order.date ? order.date.toDate().toLocaleString('es-CO') : '';
+          const itemsValue = (order.items || [])
+            .map(item => `${item.qty || item.quantity || 0} x ${item.ref || item.name || 'Producto'}`)
+            .join(' | ');
+          rows.push(buildCsvRow([
+            dateValue,
+            order.clientName || order.client || '',
+            order.supplier || '',
+            order.total || 0,
+            itemsValue
+          ]));
+        });
+
+      const csvContent = rows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const timestamp = new Date().toISOString().slice(0, 10);
+      link.href = url;
+      link.download = `historial_pedidos_${timestamp}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('success', 'CSV descargado correctamente.');
+    });
+
+    document.getElementById('clearHistoryBtn').addEventListener('click', async () => {
+      if (!ordersList.length) {
+        showToast('warning', 'No hay historial para borrar.');
+        return;
+      }
+      if (!confirm('¿Borrar todo el historial de pedidos?')) {
+        return;
+      }
+      if (!confirm('Esta acción es irreversible. ¿Confirmas borrar todo el historial?')) {
+        return;
+      }
+      showToast('warning', 'Borrando historial...', { delay: 4000 });
+      try {
+        await Promise.all(ordersList.map(order => deleteDoc(doc(db, "orders", order.id))));
+        showToast('success', 'Historial eliminado correctamente.');
+      } catch (error) {
+        showToast('error', `No se pudo borrar el historial: ${error.message}`);
+      }
+    });
+
+    window.addEventListener('online', pingFirestore);
+    window.addEventListener('offline', () => updateConnectionStatus('disconnected', 'Desconectado'));
   </script>
 </body>
 </html>
