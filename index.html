@@ -466,18 +466,23 @@
       left: 50%;
       transform: translateX(-50%);
       width: 92%;
-      max-width: 440px;
+      max-width: 460px;
       background: var(--bg-card);
       border-radius: 18px;
       box-shadow: var(--shadow-md);
       border: 1px solid rgba(148, 163, 184, 0.2);
-      padding: 0.7rem 1rem;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      z-index: 1050;
+    }
+
+    .cart-sheet-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      z-index: 1050;
-      cursor: pointer;
+      gap: 10px;
     }
 
     .cart-sheet-info {
@@ -520,9 +525,108 @@
       box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
     }
 
+    .cart-sheet-toggle {
+      display: none;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: transparent;
+      border-radius: 10px;
+      width: 36px;
+      height: 36px;
+      color: var(--secondary);
+    }
+
+    .cart-sheet-search {
+      width: 100%;
+      padding: 0.48rem 0.7rem;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      font-size: 0.85rem;
+      background: var(--bg-body);
+      color: var(--dark);
+    }
+
+    .cart-sheet-items {
+      max-height: 190px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .cart-sheet-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 12px;
+      padding: 0.45rem 0.55rem;
+      background: var(--bg-body);
+    }
+
+    .cart-sheet-item-ref {
+      font-size: 0.76rem;
+      line-height: 1.2;
+      font-weight: 700;
+      color: var(--dark);
+      word-break: break-word;
+    }
+
+    .cart-sheet-item-meta {
+      font-size: 0.74rem;
+      color: var(--secondary);
+    }
+
+    .cart-sheet-item-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .cart-sheet-btn-mini {
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: var(--bg-card);
+      color: var(--dark);
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+    }
+
+    .cart-sheet-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .cart-sheet-empty {
+      font-size: 0.84rem;
+      color: var(--secondary);
+      text-align: center;
+      padding: 0.6rem;
+      border: 1px dashed rgba(148, 163, 184, 0.35);
+      border-radius: 12px;
+    }
+
     body.dark-mode .cart-sheet {
       border-color: rgba(255, 255, 255, 0.08);
       background: rgba(30, 41, 59, 0.95);
+    }
+
+    @media (max-width: 575.98px) {
+      .cart-sheet-toggle {
+        display: inline-flex;
+      }
+      .cart-sheet.is-collapsed .cart-sheet-body {
+        display: none;
+      }
+      .cart-sheet {
+        width: calc(100% - 20px);
+      }
     }
 
     /* ===== INPUTS ===== */
@@ -732,18 +836,27 @@
     <div class="cart-badge" id="cartBadge" style="display:none;">0</div>
   </button>
 
-  <!-- Cart Sheet fijo: muestra resumen rápido del carrito y abre el modal al tocarlo. -->
-  <button class="cart-sheet" id="cartSheet" onclick="openCart()" type="button" aria-label="Abrir resumen del carrito">
-    <span class="cart-sheet-info">
-      <span class="cart-sheet-title">Total carrito</span>
-      <span class="cart-sheet-total" id="cartSheetTotal">$0</span>
-      <span class="cart-sheet-qty" id="cartSheetQty">0 items</span>
-    </span>
-    <span class="cart-sheet-action">
-      <i class="fa-solid fa-receipt"></i>
-      Ver
-    </span>
-  </button>
+  <!-- Comentario importante (flujo): este panel fijo evita abrir/cerrar el modal para micro-ajustes y acelera el pedido. -->
+  <aside class="cart-sheet" id="cartSheet" aria-live="polite" aria-label="Selección actual">
+    <div class="cart-sheet-header">
+      <span class="cart-sheet-info">
+        <span class="cart-sheet-title">Selección actual</span>
+        <span class="cart-sheet-total" id="cartSheetTotal">$0</span>
+        <span class="cart-sheet-qty" id="cartSheetQty">0 items</span>
+      </span>
+      <button class="cart-sheet-toggle" id="cartSheetToggle" type="button" aria-expanded="false" aria-controls="cartSheetBody" aria-label="Expandir o colapsar selección">
+        <i class="fa-solid fa-chevron-up"></i>
+      </button>
+    </div>
+    <div class="cart-sheet-body" id="cartSheetBody">
+      <input class="cart-sheet-search" id="cartSheetSearch" type="search" placeholder="Buscar en seleccionados..." aria-label="Buscar referencias seleccionadas">
+      <div class="cart-sheet-items" id="cartSheetItems"></div>
+      <div class="cart-sheet-footer">
+        <button class="btn btn-sm btn-light text-danger" type="button" id="cartSheetClearBtn"><i class="fa-solid fa-trash me-1"></i>Vaciar</button>
+        <button class="cart-sheet-action" type="button" id="cartSheetOpenBtn"><i class="fa-solid fa-receipt"></i>Abrir resumen</button>
+      </div>
+    </div>
+  </aside>
 
   <!-- Bottom Nav (Floating Style) -->
   <nav class="bottom-nav">
@@ -1049,6 +1162,7 @@
     let themePreference = 'auto';
     let connectionIntervalId = null;
     let editingOrderId = null;
+    let isCartSheetCollapsed = window.innerWidth <= 575;
     
     // Modal Instances (Lazy)
     let cartModalInstance = null;
@@ -1061,6 +1175,12 @@
     const cartSheet = document.getElementById('cartSheet');
     const cartSheetTotal = document.getElementById('cartSheetTotal');
     const cartSheetQty = document.getElementById('cartSheetQty');
+    const cartSheetItems = document.getElementById('cartSheetItems');
+    const cartSheetSearch = document.getElementById('cartSheetSearch');
+    const cartSheetToggle = document.getElementById('cartSheetToggle');
+    const cartSheetBody = document.getElementById('cartSheetBody');
+    const cartSheetClearBtn = document.getElementById('cartSheetClearBtn');
+    const cartSheetOpenBtn = document.getElementById('cartSheetOpenBtn');
     const toastContainer = document.getElementById('toastContainer');
 
     const toastVariants = {
@@ -1268,6 +1388,7 @@
       renderProducts();
       loadOrders();
       updateCartUI();
+      setCartSheetCollapsed(isCartSheetCollapsed);
 
       pingFirestore();
       connectionIntervalId = window.setInterval(pingFirestore, 30000);
@@ -1474,6 +1595,56 @@
       scheduleProductPatch(id);
     };
 
+    function setCartSheetCollapsed(collapsed) {
+      isCartSheetCollapsed = collapsed;
+      if (!cartSheet || !cartSheetToggle || !cartSheetBody) return;
+      cartSheet.classList.toggle('is-collapsed', collapsed);
+      cartSheetToggle.setAttribute('aria-expanded', String(!collapsed));
+      cartSheetToggle.innerHTML = `<i class="fa-solid ${collapsed ? 'fa-chevron-down' : 'fa-chevron-up'}"></i>`;
+    }
+
+    function renderCartSheetItems() {
+      if (!cartSheetItems || !cartSheetSearch) return;
+      const searchTerm = cartSheetSearch.value.trim().toLowerCase();
+      const sortedCart = [...cart].sort((a, b) => (b.qty * b.price) - (a.qty * a.price));
+      const filteredItems = sortedCart.filter(item => item.ref.toLowerCase().includes(searchTerm));
+
+      if (filteredItems.length === 0) {
+        cartSheetItems.innerHTML = `<div class="cart-sheet-empty">${searchTerm ? 'Sin coincidencias en seleccionados.' : 'No hay ítems seleccionados.'}</div>`;
+        return;
+      }
+
+      const topItems = filteredItems.slice(0, 6);
+      cartSheetItems.innerHTML = topItems.map(item => {
+        const subtotal = item.qty * item.price;
+        return `
+          <article class="cart-sheet-item" aria-label="Referencia ${item.ref}">
+            <div>
+              <div class="cart-sheet-item-ref">${item.ref}</div>
+              <div class="cart-sheet-item-meta">Cant: ${item.qty} • Subtotal: ${formatCOP(subtotal)}</div>
+            </div>
+            <div class="cart-sheet-item-actions">
+              <button class="cart-sheet-btn-mini" type="button" onclick="updateQty(${item.id}, -1)" aria-label="Reducir ${item.ref}"><i class="fa-solid fa-minus"></i></button>
+              <button class="cart-sheet-btn-mini" type="button" onclick="updateQty(${item.id}, 1)" aria-label="Aumentar ${item.ref}"><i class="fa-solid fa-plus"></i></button>
+              <button class="cart-sheet-btn-mini text-danger" type="button" onclick="removeCartItem(${item.id})" aria-label="Eliminar ${item.ref}"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      const hiddenCount = filteredItems.length - topItems.length;
+      if (hiddenCount > 0) {
+        cartSheetItems.insertAdjacentHTML('beforeend', `<div class="cart-sheet-empty">Mostrando top ${topItems.length} • ${hiddenCount} referencia(s) adicional(es).</div>`);
+      }
+    }
+
+    window.removeCartItem = (id) => {
+      // Comentario importante (sincronización): reutilizamos updateQty con delta negativo total para garantizar un único flujo de estado.
+      const item = cart.find(entry => entry.id === id);
+      if (!item) return;
+      updateQty(id, -item.qty);
+    };
+
     function updateCartUI() {
       const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
       const totalAmount = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
@@ -1499,6 +1670,14 @@
       if (cartSheet) {
         cartSheet.style.display = totalItems > 0 ? 'flex' : 'none';
       }
+
+      if (cartSheetSearch) {
+        cartSheetSearch.style.display = cart.length > 5 ? 'block' : 'none';
+        if (cart.length <= 5) cartSheetSearch.value = '';
+      }
+
+      // Comentario importante (accesibilidad): dejamos aria-live en el panel y renovamos su contenido para lectores de pantalla.
+      renderCartSheetItems();
     }
 
     window.toggleFav = (id) => {
@@ -1577,6 +1756,36 @@
     });
 
     document.getElementById('searchInput').addEventListener('keyup', debouncedRenderProducts);
+
+    if (cartSheetSearch) {
+      cartSheetSearch.addEventListener('input', () => {
+        renderCartSheetItems();
+      });
+    }
+
+    if (cartSheetToggle) {
+      cartSheetToggle.addEventListener('click', () => {
+        setCartSheetCollapsed(!isCartSheetCollapsed);
+      });
+    }
+
+    if (cartSheetClearBtn) {
+      cartSheetClearBtn.addEventListener('click', () => {
+        clearCart();
+      });
+    }
+
+    if (cartSheetOpenBtn) {
+      cartSheetOpenBtn.addEventListener('click', () => {
+        openCart();
+      });
+    }
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 575 && isCartSheetCollapsed) {
+        setCartSheetCollapsed(false);
+      }
+    });
 
     // --- CART MODAL ---
     window.openCart = () => {
