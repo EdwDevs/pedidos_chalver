@@ -732,6 +732,19 @@
     <div class="cart-badge" id="cartBadge" style="display:none;">0</div>
   </button>
 
+  <!-- Cart Sheet fijo: muestra resumen rápido del carrito y abre el modal al tocarlo. -->
+  <button class="cart-sheet" id="cartSheet" onclick="openCart()" type="button" aria-label="Abrir resumen del carrito">
+    <span class="cart-sheet-info">
+      <span class="cart-sheet-title">Total carrito</span>
+      <span class="cart-sheet-total" id="cartSheetTotal">$0</span>
+      <span class="cart-sheet-qty" id="cartSheetQty">0 items</span>
+    </span>
+    <span class="cart-sheet-action">
+      <i class="fa-solid fa-receipt"></i>
+      Ver
+    </span>
+  </button>
+
   <!-- Bottom Nav (Floating Style) -->
   <nav class="bottom-nav">
     <a href="#" class="nav-item active" onclick="switchTab('home')">
@@ -1040,6 +1053,7 @@
     // --- DOM ELEMENTS ---
     const productContainer = document.getElementById('productsContainer');
     const cartBadge = document.getElementById('cartBadge');
+    const cartSheet = document.getElementById('cartSheet');
     const cartSheetTotal = document.getElementById('cartSheetTotal');
     const cartSheetQty = document.getElementById('cartSheetQty');
     const toastContainer = document.getElementById('toastContainer');
@@ -1368,10 +1382,28 @@
     function updateCartUI() {
       const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
       const totalAmount = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-      cartBadge.textContent = totalItems;
-      cartBadge.style.display = totalItems > 0 ? 'flex' : 'none';
-      cartSheetTotal.textContent = formatCOP(totalAmount);
-      cartSheetQty.textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'items'}`;
+
+      if (cartBadge) {
+        cartBadge.textContent = totalItems;
+        cartBadge.style.display = totalItems > 0 ? 'flex' : 'none';
+      }
+
+      // Guard defensivo: si el cart sheet no está montado en una variante de layout,
+      // esta validación evita errores de null y permite que el resto de la UI siga funcionando.
+      if (cartSheetTotal) {
+        cartSheetTotal.textContent = formatCOP(totalAmount);
+      }
+
+      // Guard defensivo: no asumimos que todos los nodos existen en runtime
+      // para no romper renderizados parciales ni personalizaciones del HTML.
+      if (cartSheetQty) {
+        cartSheetQty.textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'items'}`;
+      }
+
+      // Si existe el contenedor completo, lo ocultamos cuando no hay ítems para reducir ruido visual.
+      if (cartSheet) {
+        cartSheet.style.display = totalItems > 0 ? 'flex' : 'none';
+      }
     }
 
     window.toggleFav = (id) => {
