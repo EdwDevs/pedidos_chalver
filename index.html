@@ -1038,6 +1038,11 @@
     let cart = [];
     let ordersList = []; 
     let favorites = JSON.parse(localStorage.getItem('favs') || '[]');
+    const productById = new Map(products.map(product => [product.id, product]));
+    const cartQtyById = new Map();
+    const favoriteById = new Map();
+    const pendingProductPatches = new Map();
+    let productPatchRafId = null;
     let currentView = 'grid'; 
     let activeCategory = 'all';
     let currentSort = 'name-asc';
@@ -1258,6 +1263,7 @@
       applySupplierPreference();
       applyAccessibilityPreferences();
       updateSettingsForm();
+      productContainer.addEventListener('click', handleProductsContainerClick);
 
       renderProducts();
       loadOrders();
@@ -1277,14 +1283,96 @@
 
     const debouncedRenderProducts = debounce(renderProducts, 200);
 
+    function syncDerivedIndexes() {
+      cartQtyById.clear();
+      cart.forEach(item => {
+        cartQtyById.set(item.id, item.qty);
+      });
+      favoriteById.clear();
+      favorites.forEach(id => {
+        favoriteById.set(id, true);
+      });
+    }
+
+    function updateProductNodeState(productId) {
+      const qty = cartQtyById.get(productId) || 0;
+      const isFav = favoriteById.get(productId) === true;
+      const productCard = productContainer.querySelector(`.product-card[data-product-id="${productId}"]`);
+      if (productCard) {
+        productCard.classList.toggle('in-cart', qty > 0);
+        const cardBadge = productCard.querySelector('.product-card-badge');
+        if (qty > 0) {
+          if (cardBadge) {
+            cardBadge.innerHTML = `<i class="fa-solid fa-cart-shopping"></i> ${qty}`;
+          } else {
+            productCard.insertAdjacentHTML('afterbegin', `<div class="product-card-badge"><i class="fa-solid fa-cart-shopping"></i> ${qty}</div>`);
+          }
+        } else if (cardBadge) {
+          cardBadge.remove();
+        }
+        const qtyInput = productCard.querySelector('.stepper-input');
+        if (qtyInput) qtyInput.value = qty;
+        const favBtn = productCard.querySelector('.fav-btn');
+        if (favBtn) {
+          favBtn.classList.toggle('active', isFav);
+          const favIcon = favBtn.querySelector('i');
+          if (favIcon) favIcon.className = `${isFav ? 'fa-solid' : 'fa-regular'} fa-star`;
+        }
+      }
+
+      const productRow = productContainer.querySelector(`tr[data-product-id="${productId}"]`);
+      if (productRow) {
+        productRow.style.background = qty > 0 ? 'rgba(37,99,235,0.05)' : '';
+        const qtyInput = productRow.querySelector('.stepper-input');
+        if (qtyInput) qtyInput.value = qty;
+      }
+    }
+
+    function flushProductPatches() {
+      pendingProductPatches.forEach((_, productId) => {
+        // Comentario importante: aquí evitamos renderProducts() para no reconstruir toda la grilla/tabla.
+        updateProductNodeState(productId);
+      });
+      pendingProductPatches.clear();
+      productPatchRafId = null;
+    }
+
+    function scheduleProductPatch(productId) {
+      pendingProductPatches.set(productId, true);
+      if (productPatchRafId !== null) return;
+      // Comentario importante: requestAnimationFrame agrupa cambios rápidos y aplica patch granular en lote.
+      productPatchRafId = window.requestAnimationFrame(flushProductPatches);
+    }
+
+    function handleProductsContainerClick(event) {
+      const actionButton = event.target.closest('[data-action]');
+      if (!actionButton || !productContainer.contains(actionButton)) return;
+      const productId = Number(actionButton.dataset.productId);
+      if (!Number.isFinite(productId)) return;
+
+      const action = actionButton.dataset.action;
+      if (action === 'toggle-fav') {
+        toggleFav(productId);
+        return;
+      }
+      if (action === 'qty-plus') {
+        updateQty(productId, 1);
+        return;
+      }
+      if (action === 'qty-minus') {
+        updateQty(productId, -1);
+      }
+    }
+
     // --- RENDER LOGIC ---
     function renderProducts() {
+      syncDerivedIndexes();
       const term = document.getElementById('searchInput').value.toLowerCase();
       
       let filtered = products.filter(p => {
         const matchSearch = p.name.toLowerCase().includes(term) || p.principle.toLowerCase().includes(term);
         const matchCat = activeCategory === 'all' ? true : 
-                         activeCategory === 'favorites' ? favorites.includes(p.id) : 
+                         activeCategory === 'favorites' ? favoriteById.get(p.id) === true : 
                          p.category === activeCategory;
         return matchSearch && matchCat;
       });
@@ -1307,17 +1395,16 @@
       if (currentView === 'grid') {
         productContainer.className = 'product-grid';
         productContainer.innerHTML = filtered.map(p => {
-          const isFav = favorites.includes(p.id);
-          const inCart = cart.find(c => c.id === p.id);
-          const qty = inCart ? inCart.qty : 0;
+          const isFav = favoriteById.get(p.id) === true;
+          const qty = cartQtyById.get(p.id) || 0;
           const cardClass = qty > 0 ? 'product-card in-cart' : 'product-card';
 
           return `
-            <div class="${cardClass}">
+            <div class="${cardClass}" data-product-id="${p.id}">
               ${qty > 0 ? `<div class="product-card-badge"><i class="fa-solid fa-cart-shopping"></i> ${qty}</div>` : ''}
               <div class="card-header-prod">
                 <div class="prod-ref">${p.ref}</div>
-                <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav(${p.id})">
+                <button class="fav-btn ${isFav ? 'active' : ''}" data-action="toggle-fav" data-product-id="${p.id}">
                   <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-star"></i>
                 </button>
               </div>
@@ -1337,10 +1424,9 @@
             <thead><tr><th>Ref</th><th>Precio</th><th style="text-align:center">Cant</th></tr></thead>
             <tbody>
               ${filtered.map(p => {
-                const inCart = cart.find(c => c.id === p.id);
-                const qty = inCart ? inCart.qty : 0;
+                const qty = cartQtyById.get(p.id) || 0;
                 return `
-                  <tr style="${qty > 0 ? 'background:rgba(37,99,235,0.05)' : ''}">
+                  <tr data-product-id="${p.id}" style="${qty > 0 ? 'background:rgba(37,99,235,0.05)' : ''}">
                     <td><strong>${p.ref}</strong><br><span class="text-muted small">${p.principle}</span></td>
                     <td class="text-price">${formatCOP(p.price)}</td>
                     <td width="100">${renderStepper(p.id, qty)}</td>
@@ -1356,27 +1442,36 @@
     function renderStepper(id, qty) {
       return `
         <div class="stepper">
-          <button class="stepper-btn" onclick="updateQty(${id}, -1)"><i class="fa-solid fa-minus"></i></button>
+          <button class="stepper-btn" data-action="qty-minus" data-product-id="${id}"><i class="fa-solid fa-minus"></i></button>
           <input type="text" class="stepper-input" value="${qty}" readonly>
-          <button class="stepper-btn" onclick="updateQty(${id}, 1)"><i class="fa-solid fa-plus"></i></button>
+          <button class="stepper-btn" data-action="qty-plus" data-product-id="${id}"><i class="fa-solid fa-plus"></i></button>
         </div>
       `;
     }
 
     // --- ACTIONS ---
     window.updateQty = (id, change) => {
-      const product = products.find(p => p.id === id);
-      const existing = cart.find(c => c.id === id);
-      
-      if (existing) {
-        existing.qty += change;
-        if (existing.qty <= 0) cart = cart.filter(c => c.id !== id);
-      } else if (change > 0) {
-        cart.push({ ...product, qty: 1 });
+      const product = productById.get(id);
+      if (!product) return;
+      const currentQty = cartQtyById.get(id) || 0;
+      const nextQty = currentQty + change;
+
+      if (nextQty <= 0) {
+        cartQtyById.delete(id);
+        cart = cart.filter(c => c.id !== id);
+      } else {
+        cartQtyById.set(id, nextQty);
+        const existingIndex = cart.findIndex(c => c.id === id);
+        if (existingIndex >= 0) {
+          cart[existingIndex].qty = nextQty;
+        } else {
+          cart.push({ ...product, qty: nextQty });
+        }
       }
       
       updateCartUI();
-      renderProducts(); // Re-render to update visual state
+      // Comentario importante: updateQty ya no dispara render global; aplica patch local para el producto afectado.
+      scheduleProductPatch(id);
     };
 
     function updateCartUI() {
@@ -1407,13 +1502,20 @@
     }
 
     window.toggleFav = (id) => {
-      if (favorites.includes(id)) {
+      if (favoriteById.get(id) === true) {
+        favoriteById.delete(id);
         favorites = favorites.filter(fid => fid !== id);
       } else {
+        favoriteById.set(id, true);
         favorites.push(id);
       }
       localStorage.setItem('favs', JSON.stringify(favorites));
-      renderProducts();
+      if (activeCategory === 'favorites') {
+        // En vista de favoritos sí se requiere render global porque cambia el conjunto filtrado.
+        renderProducts();
+      } else {
+        scheduleProductPatch(id);
+      }
     };
 
     window.toggleView = () => {
